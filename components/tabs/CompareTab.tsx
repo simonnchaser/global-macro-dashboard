@@ -10,10 +10,19 @@ import { useUserSettings } from '@/lib/store/userSettingsStore';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
 import { useMetricTimeSeries, useMetricCurrentValue } from '@/lib/hooks/useMetrics';
 import MetricSelectorModal from '@/components/modals/MetricSelectorModal';
+import ChartModal from '@/components/modals/ChartModal';
 import type { MetricId } from '@/lib/metrics/metricsTypes';
 
 // 개별 차트 컴포넌트
-function CompareChartItem({ metricId, onRemove }: { metricId: MetricId; onRemove: () => void }) {
+function CompareChartItem({
+  metricId,
+  onRemove,
+  onClick
+}: {
+  metricId: MetricId;
+  onRemove: () => void;
+  onClick: () => void;
+}) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [period, setPeriod] = useState<'1M' | '3M' | '6M' | '1Y'>('3M');
 
@@ -86,11 +95,14 @@ function CompareChartItem({ metricId, onRemove }: { metricId: MetricId; onRemove
     : 'text-[#22c55e]';
 
   return (
-    <div className="bg-[#1e2530] border border-[#2d3748] rounded-xl p-4 shadow-lg relative">
+    <div className="bg-[#1e2530] border border-[#2d3748] rounded-xl p-4 shadow-lg relative group">
       {/* 삭제 버튼 */}
       <button
-        onClick={onRemove}
-        className="absolute top-2 right-2 text-slate-400 hover:text-red-400 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
+        className="absolute top-2 right-2 z-10 text-slate-400 hover:text-red-400 transition-colors"
         title="비교에서 제거"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,8 +110,22 @@ function CompareChartItem({ metricId, onRemove }: { metricId: MetricId; onRemove
         </svg>
       </button>
 
+      {/* 확대 아이콘 (hover 시 표시) */}
+      <button
+        onClick={onClick}
+        className="absolute top-2 right-10 z-10 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-[#3b82f6]"
+        title="확대해서 보기"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+        </svg>
+      </button>
+
       {/* 지표 이름 + 현재값 */}
-      <div className="mb-3">
+      <div
+        className="mb-3 cursor-pointer"
+        onClick={onClick}
+      >
         <div className="text-sm font-semibold text-slate-200">{meta.label}</div>
         <div className="flex items-baseline gap-2 mt-1">
           <div className={`text-lg font-mono font-semibold ${valueColor}`}>
@@ -154,6 +180,7 @@ function EmptySlot({ onClick }: { onClick: () => void }) {
 export default function CompareTab() {
   const { compareCharts, removeCompareChart, addCompareChart } = useUserSettings();
   const [showSelector, setShowSelector] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<MetricId | null>(null);
 
   // 6개 슬롯 생성 (빈 슬롯 포함)
   const slots = Array.from({ length: 6 }, (_, i) => compareCharts[i] || null);
@@ -176,6 +203,7 @@ export default function CompareTab() {
               key={metricId}
               metricId={metricId}
               onRemove={() => removeCompareChart(metricId)}
+              onClick={() => setSelectedMetric(metricId)}
             />
           ) : (
             <EmptySlot key={`empty-${index}`} onClick={() => setShowSelector(true)} />
@@ -193,6 +221,14 @@ export default function CompareTab() {
           }}
           onClose={() => setShowSelector(false)}
           selectedMetrics={compareCharts}
+        />
+      )}
+
+      {/* 차트 확대 모달 */}
+      {selectedMetric && (
+        <ChartModal
+          metricId={selectedMetric}
+          onClose={() => setSelectedMetric(null)}
         />
       )}
     </div>
