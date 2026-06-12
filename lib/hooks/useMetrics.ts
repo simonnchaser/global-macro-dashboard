@@ -1,56 +1,148 @@
-/**
- * 지표 데이터 훅
- *
- * 현재: mockData에서 데이터 읽기
- * 향후: API(FRED, Yahoo Finance 등)에서 fetch
- *
- * 중요: 컴포넌트는 이 훅을 통해서만 데이터에 접근해야 함
- * mockData를 직접 import하면 안 됨!
- */
+'use client'
 
-'use client';
+import { useState, useEffect } from 'react'
+import type { FredMetricId, MetricSnapshot, TimeSeriesPoint, FredApiResponse } from '@/lib/types/metrics'
+import { mockSnapshots } from '@/lib/mock/mockData'
 
-import { useMemo } from 'react';
-import type { MetricId } from '@/lib/metrics/metricsTypes';
-import { mockMetricsData } from '@/lib/mock/mockData';
-import { mockTimeSeriesData } from '@/lib/mock/mockTimeSeriesData';
+function buildSnapshot(
+  id: FredMetricId,
+  timeSeries: TimeSeriesPoint[]
+): MetricSnapshot {
+  const latest = timeSeries[timeSeries.length - 1]
+  const prev   = timeSeries[timeSeries.length - 2]
 
-/**
- * 현재값 + 변화량 데이터
- */
-export function useMetricCurrentValue(metricId: MetricId) {
-  return useMemo(() => {
-    return mockMetricsData[metricId];
-  }, [metricId]);
+  const change        = prev ? latest.value - prev.value : 0
+  const changePercent = prev ? (change / prev.value) * 100 : 0
+
+  return {
+    id,
+    value:         latest.value,
+    change:        Math.round(change * 1000) / 1000,
+    changePercent: Math.round(changePercent * 100) / 100,
+    updatedAt:     latest.time,
+  }
 }
 
-/**
- * 시계열 데이터
- */
-export function useMetricTimeSeries(metricId: MetricId) {
-  return useMemo(() => {
-    return mockTimeSeriesData[metricId];
-  }, [metricId]);
+export function useMetricSnapshot(
+  id: FredMetricId,
+  period: string = '3M'
+): { snapshot: MetricSnapshot | null; isLoading: boolean; error: string | null } {
+  const [snapshot, setSnapshot] = useState<MetricSnapshot | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    async function fetchData() {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const res = await fetch(`/api/fred?metricId=${id}&period=${period}`)
+        if (!res.ok) throw new Error(`API error: ${res.status}`)
+
+        const data: FredApiResponse = await res.json()
+
+        if (!mounted) return
+
+        if (data.timeSeries.length === 0) {
+          throw new Error('No data available')
+        }
+
+        const snap = buildSnapshot(id, data.timeSeries)
+        setSnapshot(snap)
+      } catch (err) {
+        console.warn(`[useMetricSnapshot] Failed to fetch ${id}, using mockData:`, err)
+
+        if (!mounted) return
+
+        setSnapshot(mockSnapshots[id])
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchData()
+
+    return () => {
+      mounted = false
+    }
+  }, [id, period])
+
+  return { snapshot, isLoading, error }
 }
 
-/**
- * 모든 지표의 현재값 (TopBar 등에서 사용)
- */
-export function useAllMetricsCurrentValues() {
-  return useMemo(() => {
-    return mockMetricsData;
-  }, []);
+export function useMetricTimeSeries(
+  id: FredMetricId,
+  period: string = '3M'
+): { timeSeries: TimeSeriesPoint[]; isLoading: boolean; error: string | null } {
+  const [timeSeries, setTimeSeries] = useState<TimeSeriesPoint[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    async function fetchData() {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const res = await fetch(`/api/fred?metricId=${id}&period=${period}`)
+        if (!res.ok) throw new Error(`API error: ${res.status}`)
+
+        const data: FredApiResponse = await res.json()
+
+        if (!mounted) return
+
+        if (data.timeSeries.length === 0) {
+          throw new Error('No data available')
+        }
+
+        setTimeSeries(data.timeSeries)
+      } catch (err) {
+        console.warn(`[useMetricTimeSeries] Failed to fetch ${id}:`, err)
+
+        if (!mounted) return
+
+        setTimeSeries([])
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchData()
+
+    return () => {
+      mounted = false
+    }
+  }, [id, period])
+
+  return { timeSeries, isLoading, error }
 }
 
-/**
- * 여러 지표의 현재값 가져오기 (핀 목록 등)
- */
-export function useMetricsCurrentValues(metricIds: MetricId[]) {
-  return useMemo(() => {
-    const result: Record<string, typeof mockMetricsData[MetricId]> = {};
-    metricIds.forEach((id) => {
-      result[id] = mockMetricsData[id];
-    });
-    return result;
-  }, [metricIds]);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useMetricCurrentValue(metricId: any) {
+  const { snapshot } = useMetricSnapshot(metricId as FredMetricId, '3M')
+  return snapshot ? { value: snapshot.value, change: snapshot.change, updatedAt: snapshot.updatedAt } : null
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useMetricsCurrentValues(metricIds: any[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result: Record<string, any> = {}
+  metricIds.forEach((id) => {
+    if (mockSnapshots[id as FredMetricId]) {
+      const snap = mockSnapshots[id as FredMetricId]
+      result[id] = { value: snap.value, change: snap.change }
+    }
+  })
+  return result
 }

@@ -101,6 +101,87 @@ export const metricsMeta: MetricMeta[] = [
   },
 
   {
+    id: 'igOas',
+    label: 'IG OAS',
+    labelKo: '투자등급 스프레드',
+    unit: 'bp',
+    tab: 'liquidity',
+    positiveIsGood: false,
+    description: '투자등급 회사채와 미국 국채의 금리 차이.',
+    interpretation:
+      'HY OAS보다 변동성이 작지만 신용시장 전체의 건강도를 보여준다. ' +
+      'IG OAS 확대는 우량 기업조차 자금 조달 비용이 높아짐을 의미.',
+    relationships: [
+      'IG OAS↑ → 신용시장 전반 긴축',
+      'IG + HY 동시 확대 → Risk Off 강력 신호',
+    ],
+    chartConfig: {
+      color: '#f97316',
+      referenceLines: [100, 150, 200],
+    },
+  },
+
+  {
+    id: 'fedAssets',
+    label: 'Fed Assets',
+    labelKo: 'Fed 자산',
+    unit: '조달러',
+    tab: 'liquidity',
+    positiveIsGood: true,
+    description: 'Fed 대차대조표 총자산. QE로 증가, QT로 감소.',
+    interpretation:
+      'Fed가 시장에서 국채·MBS를 매입하면 증가. ' +
+      '자산 증가 = 시중 통화량 증가 = 유동성 증가.',
+    relationships: [
+      'Fed Assets↑ → QE 진행 중 → 주가 우호적',
+      'Fed Assets↓ → QT 진행 중 → 유동성 축소',
+    ],
+    chartConfig: {
+      color: '#10b981',
+    },
+  },
+
+  {
+    id: 'tga',
+    label: 'TGA',
+    labelKo: '재무부 계좌',
+    unit: '억달러',
+    tab: 'liquidity',
+    positiveIsGood: false,
+    description: '미국 재무부가 Fed에 보유한 현금. 국채 발행으로 증가.',
+    interpretation:
+      'TGA 증가 = 재무부가 국채를 팔아 시장에서 현금을 흡수 = 유동성 감소. ' +
+      'TGA 감소 = 재무부가 돈을 쓰면서 시장에 현금 방출 = 유동성 증가.',
+    relationships: [
+      'TGA↑ → Net Liquidity↓ → 주가 압박',
+      'TGA↓ → Net Liquidity↑ → 주가 우호적',
+    ],
+    chartConfig: {
+      color: '#ef4444',
+    },
+  },
+
+  {
+    id: 'rrp',
+    label: 'RRP',
+    labelKo: '역레포',
+    unit: '억달러',
+    tab: 'liquidity',
+    positiveIsGood: false,
+    description: 'Fed의 역레포 잔액. MMF가 초과 현금을 Fed에 맡긴 금액.',
+    interpretation:
+      'RRP 증가 = 시장에서 돈이 Fed로 회수됨 = 유동성 감소. ' +
+      'RRP 감소 = Fed에 맡긴 돈이 시장으로 나옴 = 유동성 증가.',
+    relationships: [
+      'RRP↑ → Net Liquidity↓',
+      'RRP↓ → Net Liquidity↑ → 주가 우호적',
+    ],
+    chartConfig: {
+      color: '#f59e0b',
+    },
+  },
+
+  {
     id: 'netLiquidity',
     label: 'Net Liquidity',
     labelKo: '순유동성',
@@ -238,6 +319,98 @@ export const metricsMeta: MetricMeta[] = [
     interpretation: 'Fed의 의도가 직접 반영되는 유일한 금리. 다른 모든 금리의 기준점.',
     relationships: ['Fed Rate↑ → 모든 자산 할인율↑'],
     chartConfig: { color: '#06b6d4' },
+  },
+
+  // === 경제지표 ===
+  {
+    id: 'cpiUs',
+    label: 'CPI (US)',
+    labelKo: '미국 소비자물가지수',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: '미국 소비자물가지수 전년 대비 상승률. Fed의 가장 중요한 인플레 지표.',
+    interpretation: 'Fed의 목표는 2%. 2% 초과 시 긴축, 2% 미만 시 완화 압력.',
+    relationships: ['CPI↑ → Fed 긴축 기대 → 금리↑'],
+    chartConfig: { color: '#ef4444' },
+  },
+
+  {
+    id: 'pceUs',
+    label: 'PCE (US)',
+    labelKo: '개인소비지출 물가지수',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: 'Fed가 공식 인플레 목표로 사용하는 지표. CPI보다 포괄적.',
+    interpretation: 'Fed의 공식 목표 지표. 2% 목표.',
+    relationships: ['PCE > 2% → Fed 긴축 압력'],
+    chartConfig: { color: '#f97316' },
+  },
+
+  {
+    id: 'corePce',
+    label: 'Core PCE',
+    labelKo: '근원 PCE',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: 'PCE에서 식품·에너지 제외. 변동성 낮은 근원 인플레.',
+    interpretation: 'Fed가 가장 중시하는 인플레 지표. 일시적 요인 제거.',
+    relationships: ['Core PCE > 2% → Fed 긴축 지속'],
+    chartConfig: { color: '#dc2626' },
+  },
+
+  {
+    id: 'trimmedPce',
+    label: 'Trimmed PCE',
+    labelKo: '절사평균 PCE',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: '극단값 제외한 PCE. 더 안정적인 추세 인플레 측정.',
+    interpretation: '장기 인플레 추세를 보는 지표.',
+    relationships: ['Trimmed PCE 상승 → 인플레 고착화 우려'],
+    chartConfig: { color: '#ea580c' },
+  },
+
+  {
+    id: 'ppiUs',
+    label: 'PPI (US)',
+    labelKo: '생산자물가지수',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: '생산자가 받는 가격 지수. CPI보다 선행.',
+    interpretation: 'PPI 상승이 CPI로 전이되는지가 핵심.',
+    relationships: ['PPI↑ → CPI↑ 선행 신호'],
+    chartConfig: { color: '#f59e0b' },
+  },
+
+  {
+    id: 'unemployment',
+    label: 'Unemployment',
+    labelKo: '실업률',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: '미국 실업률. Fed의 이중 목표 중 하나.',
+    interpretation: '실업률↑ → 경기 약화 → Fed 완화 압력.',
+    relationships: ['실업률↑ → Fed 인하 압력'],
+    chartConfig: { color: '#6366f1' },
+  },
+
+  {
+    id: 'gdpUs',
+    label: 'GDP (US)',
+    labelKo: '미국 GDP 성장률',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: true,
+    description: '미국 실질 GDP 전년 대비 성장률. 경기 종합 지표.',
+    interpretation: 'GDP 고성장 + 고인플레 → 긴축. GDP 저성장 + 저인플레 → 완화.',
+    relationships: ['GDP↑ + CPI↑ → 긴축 국면'],
+    chartConfig: { color: '#10b981' },
   },
 ];
 

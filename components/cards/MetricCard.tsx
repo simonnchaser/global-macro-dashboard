@@ -19,34 +19,27 @@ export default function MetricCard({ metricId, onClick }: MetricCardProps) {
 
   if (!meta || !data) return null;
 
-  const isPositive = data.change !== null && data.change > 0;
-  const isNegative = data.change !== null && data.change < 0;
-
-  // positiveIsGood에 따라 색상 결정
-  const valueColor = meta.positiveIsGood
-    ? isPositive
-      ? 'text-[#22c55e]'
-      : isNegative
-      ? 'text-[#ef4444]'
-      : 'text-slate-200'
-    : isPositive
-    ? 'text-[#ef4444]'  // 상승이 나쁜 지표
-    : isNegative
-    ? 'text-[#22c55e]'
+  // 단순 색상 로직: change 값 기준
+  const valueColor = data.change > 0
+    ? 'text-green-400'
+    : data.change < 0
+    ? 'text-red-400'
     : 'text-slate-200';
 
-  const changeColor = meta.positiveIsGood
-    ? isPositive
-      ? 'text-[#22c55e]'
-      : 'text-[#ef4444]'
-    : isPositive
-    ? 'text-[#ef4444]'
-    : 'text-[#22c55e]';
+  const changeColor = data.change > 0
+    ? 'text-green-400'
+    : data.change < 0
+    ? 'text-red-400'
+    : 'text-slate-400';
 
   // 2Y-10Y Spread 음수일 때 보더 주황색
   const borderColor = metricId === 'spread2y10y' && data.value < 0
     ? 'border-orange-500'
     : 'border-[#2d3748]';
+
+  // 월별/분기별 지표는 날짜 표시
+  const monthlyMetrics = ['cpiUs', 'pceUs', 'corePce', 'trimmedPce', 'ppiUs', 'unemployment', 'gdpUs'];
+  const showDate = monthlyMetrics.includes(metricId as string);
 
   return (
     <div
@@ -62,6 +55,11 @@ export default function MetricCard({ metricId, onClick }: MetricCardProps) {
       {data.change !== null && (
         <div className={`text-xs font-mono ${changeColor}`}>
           {data.change > 0 ? '+' : ''}{data.change.toFixed(2)}
+        </div>
+      )}
+      {showDate && data.updatedAt && (
+        <div className="text-[10px] text-slate-500 mt-2">
+          {data.updatedAt} 기준
         </div>
       )}
     </div>

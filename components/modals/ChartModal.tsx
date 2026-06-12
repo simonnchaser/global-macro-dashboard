@@ -19,12 +19,12 @@ interface ChartModalProps {
 
 export default function ChartModal({ metricId, onClose }: ChartModalProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const [period, setPeriod] = useState<'1M' | '3M' | '6M' | '1Y'>('3M');
+  const [period, setPeriod] = useState<'1M' | '3M' | '6M' | '1Y' | 'MAX'>('6M');
   const [showAlarmModal, setShowAlarmModal] = useState(false);
 
   const meta = getMetricMeta(metricId);
   const currentData = useMetricCurrentValue(metricId);
-  const timeSeriesData = useMetricTimeSeries(metricId);
+  const { timeSeries: timeSeriesData } = useMetricTimeSeries(metricId as any, period);
 
   const { compareCharts, addCompareChart, addAlarm } = useUserSettings();
 
@@ -33,13 +33,7 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
   const canAddToCompare = compareCharts.length < 6; // 최대 6개
 
   useEffect(() => {
-    if (!chartContainerRef.current || !meta) return;
-
-    // 기간별 데이터 필터링
-    const filterDataByPeriod = (data: typeof timeSeriesData, period: string) => {
-      const days = period === '1M' ? 30 : period === '3M' ? 90 : period === '6M' ? 180 : 365;
-      return data.slice(-days);
-    };
+    if (!chartContainerRef.current || !meta || !timeSeriesData.length) return;
 
     // 차트 생성
     const chart = createChart(chartContainerRef.current, {
@@ -67,9 +61,8 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
       lineWidth: 2,
     });
 
-    // 기간에 따라 데이터 필터링
-    const filteredData = filterDataByPeriod(timeSeriesData, period);
-    lineSeries.setData(filteredData);
+    // API에서 이미 period에 맞게 데이터를 가져왔으므로 그대로 사용
+    lineSeries.setData(timeSeriesData);
 
     // 2Y-10Y Spread인 경우 음수 구간 음영 처리
     if (metricId === 'spread2y10y' && meta.chartConfig.negativeZoneColor) {
@@ -80,7 +73,7 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
       });
 
       // 음수인 부분만 음영
-      const negativeData = filteredData.map((d) => ({
+      const negativeData = timeSeriesData.map((d: { time: string; value: number }) => ({
         time: d.time,
         value: d.value < 0 ? d.value : 0,
       }));
@@ -133,17 +126,23 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
           <div>
             <h2 className="text-xl font-semibold text-slate-200">{meta.label}</h2>
             <div className="text-sm text-slate-400 mt-1">
-              현재값: <span className="font-mono text-slate-200">{currentData.value.toLocaleString()}{meta.unit}</span>
-              {currentData.change !== null && (
-                <span className={`ml-2 font-mono ${currentData.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {currentData.change > 0 ? '+' : ''}{currentData.change.toFixed(2)}
-                </span>
+              {currentData ? (
+                <>
+                  현재값: <span className="font-mono text-slate-200">{currentData.value.toLocaleString()}{meta.unit}</span>
+                  {currentData.change !== null && (
+                    <span className={`ml-2 font-mono ${currentData.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {currentData.change > 0 ? '+' : ''}{currentData.change.toFixed(2)}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-slate-500">Loading...</span>
               )}
             </div>
           </div>
           <div className="flex items-center gap-3">
             {/* 기간 선택 */}
-            {(['1M', '3M', '6M', '1Y'] as const).map((p) => (
+            {(['1M', '3M', '6M', '1Y', 'MAX'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
