@@ -12,7 +12,7 @@ interface BondsTabProps {
 }
 
 export default function BondsTab({ onMetricClick }: BondsTabProps) {
-  const bondMetrics = ['fedRate', 'us2y', 'us10y', 'spread2y10y', 'bokRate', 'kr10y', 'jp10y'] as const;
+  const bondMetrics = ['fedRate', 'us2y', 'us10y', 'spread2y10y', 'bokRate', 'kr3y', 'kr10y', 'jp10y'] as const;
 
   return (
     <div className="pt-4 px-6 pb-8">

@@ -13,7 +13,8 @@ interface LiquidityTabProps {
 
 export default function LiquidityTab({ onMetricClick }: LiquidityTabProps) {
   const liquidityMetrics = ['fedAssets', 'tga', 'rrp', 'netLiquidity'] as const;
-  const creditMetrics = ['hyOas', 'igOas', 'koreaCds'] as const;
+  const creditMetrics = ['hyOas', 'igOas', 'krIgSpread', 'krHySpread'] as const;
+  const koreanMetrics = ['krFxReserves'] as const;
 
   return (
     <div className="pt-4 px-6 pb-8">
@@ -47,7 +48,7 @@ export default function LiquidityTab({ onMetricClick }: LiquidityTabProps) {
       {/* 크레딧 섹션 */}
       <div>
         <h2 className="text-lg font-semibold mb-4 text-slate-200">크레딧</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {creditMetrics.map((metricId) => (
             <MetricCard
               key={metricId}
@@ -62,6 +63,20 @@ export default function LiquidityTab({ onMetricClick }: LiquidityTabProps) {
           <div className="text-sm mb-2">HY OAS 420bp + VIX (낮음) 기준:</div>
           <div className="text-lg font-semibold mb-2">🟢 Risk ON — 위험 선호 국면</div>
           <div className="text-sm">주식 우호 / 신흥국 자금 유입 가능</div>
+        </div>
+      </div>
+
+      {/* 한국 섹션 */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-4 text-slate-200">한국</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {koreanMetrics.map((metricId) => (
+            <MetricCard
+              key={metricId}
+              metricId={metricId}
+              onClick={() => onMetricClick(metricId)}
+            />
+          ))}
         </div>
       </div>
     </div>

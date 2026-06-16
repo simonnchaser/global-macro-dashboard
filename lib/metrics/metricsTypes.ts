@@ -10,7 +10,7 @@ export type MetricId =
   | 'foreignNetBuy' | 'foreignOwnership' | 'fearGreed' | 'cpRatio'
   // 금리·채권
   | 'fedRate' | 'us2y' | 'us10y' | 'spread2y10y'
-  | 'bokRate' | 'kr10y' | 'jp10y'
+  | 'bokRate' | 'kr3y' | 'kr10y' | 'jp10y'
   // 환율
   | 'usdKrw' | 'dxy' | 'usdJpy' | 'eurUsd'
   // 원자재
@@ -19,9 +19,10 @@ export type MetricId =
   | 'fedAssets' | 'tga' | 'rrp' | 'netLiquidity'
   // 크레딧
   | 'hyOas' | 'igOas' | 'koreaCds'
+  | 'krIgSpread' | 'krHySpread' | 'krCorpAA' | 'krCorpBBB' | 'krFxReserves'
   // 경제지표
-  | 'cpiUs' | 'pceUs' | 'trimmedPce' | 'ppiUs'
-  | 'unemployment' | 'pmi' | 'gdpUs' | 'cpiKr';
+  | 'cpiUs' | 'pceUs' | 'corePce' | 'trimmedPce' | 'ppiUs'
+  | 'unemployment' | 'pmi' | 'gdpUs' | 'cpiKr' | 'unemploymentKr';
 
 export interface MetricValue {
   value: number;
@@ -83,7 +84,7 @@ export interface UserSettings {
 }
 
 export const defaultSettings: UserSettings = {
-  pinnedMetrics: ['vix', 'hyOas', 'netLiquidity', 'usdKrw'],
+  pinnedMetrics: ['hyOas', 'netLiquidity', 'usdKrw', 'sp500'],
   compareCharts: [],
   alarms: [],
   defaultChartPeriod: '3M',

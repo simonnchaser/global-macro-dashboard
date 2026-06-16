@@ -1,8 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { FredMetricId, MetricSnapshot, TimeSeriesPoint, FredApiResponse } from '@/lib/types/metrics'
-import { mockSnapshots } from '@/lib/mock/mockData'
+import type { FredMetricId, MetricSnapshot, TimeSeriesPoint, FredApiResponse, EcosMetricId, EcosMetricSnapshot, EcosApiResponse } from '@/lib/types/metrics'
+import { mockSnapshots, mockEcosSnapshots } from '@/lib/mock/mockData'
+import { ECOS_CALCULATED } from '@/lib/api/ecos'
+
+// 지표 ID가 ECOS인지 판단
+function isEcosMetric(id: string): id is EcosMetricId {
+  const ecosMetrics: EcosMetricId[] = [
+    'bokRate', 'kr3y', 'kr10y', 'cpiKr', 'unemploymentKr',
+    'krCorpAA', 'krCorpBBB', 'krFxReserves', 'krIgSpread', 'krHySpread'
+  ]
+  return ecosMetrics.includes(id as EcosMetricId)
+}
 
 function buildSnapshot(
   id: FredMetricId,
@@ -24,10 +34,10 @@ function buildSnapshot(
 }
 
 export function useMetricSnapshot(
-  id: FredMetricId,
+  id: FredMetricId | EcosMetricId | any,
   period: string = '3M'
-): { snapshot: MetricSnapshot | null; isLoading: boolean; error: string | null } {
-  const [snapshot, setSnapshot] = useState<MetricSnapshot | null>(null)
+): { snapshot: MetricSnapshot | EcosMetricSnapshot | null; isLoading: boolean; error: string | null } {
+  const [snapshot, setSnapshot] = useState<MetricSnapshot | EcosMetricSnapshot | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,10 +49,12 @@ export function useMetricSnapshot(
       setError(null)
 
       try {
-        const res = await fetch(`/api/fred?metricId=${id}&period=${period}`)
+        // API endpoint 결정
+        const apiEndpoint = isEcosMetric(id) ? 'ecos' : 'fred'
+        const res = await fetch(`/api/${apiEndpoint}?metricId=${id}&period=${period}`)
         if (!res.ok) throw new Error(`API error: ${res.status}`)
 
-        const data: FredApiResponse = await res.json()
+        const data: FredApiResponse | EcosApiResponse = await res.json()
 
         if (!mounted) return
 
@@ -57,7 +69,9 @@ export function useMetricSnapshot(
 
         if (!mounted) return
 
-        setSnapshot(mockSnapshots[id])
+        // Fallback to appropriate mock data
+        const mockData = isEcosMetric(id) ? mockEcosSnapshots[id as EcosMetricId] : mockSnapshots[id as FredMetricId]
+        setSnapshot(mockData)
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         if (mounted) {
@@ -77,7 +91,7 @@ export function useMetricSnapshot(
 }
 
 export function useMetricTimeSeries(
-  id: FredMetricId,
+  id: FredMetricId | EcosMetricId | any,
   period: string = '3M'
 ): { timeSeries: TimeSeriesPoint[]; isLoading: boolean; error: string | null } {
   const [timeSeries, setTimeSeries] = useState<TimeSeriesPoint[]>([])
@@ -92,10 +106,11 @@ export function useMetricTimeSeries(
       setError(null)
 
       try {
-        const res = await fetch(`/api/fred?metricId=${id}&period=${period}`)
+        const apiEndpoint = isEcosMetric(id) ? 'ecos' : 'fred'
+        const res = await fetch(`/api/${apiEndpoint}?metricId=${id}&period=${period}`)
         if (!res.ok) throw new Error(`API error: ${res.status}`)
 
-        const data: FredApiResponse = await res.json()
+        const data: FredApiResponse | EcosApiResponse = await res.json()
 
         if (!mounted) return
 
@@ -137,12 +152,58 @@ export function useMetricCurrentValue(metricId: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useMetricsCurrentValues(metricIds: any[]) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result: Record<string, any> = {}
-  metricIds.forEach((id) => {
-    if (mockSnapshots[id as FredMetricId]) {
-      const snap = mockSnapshots[id as FredMetricId]
-      result[id] = { value: snap.value, change: snap.change }
+  const [values, setValues] = useState<Record<string, any>>({})
+
+  useEffect(() => {
+    let mounted = true
+
+    async function fetchAllMetrics() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result: Record<string, any> = {}
+
+      await Promise.all(
+        metricIds.map(async (id) => {
+          try {
+            const apiEndpoint = isEcosMetric(id) ? 'ecos' : 'fred'
+            const res = await fetch(`/api/${apiEndpoint}?metricId=${id}&period=3M`)
+
+            if (!res.ok) throw new Error(`API error: ${res.status}`)
+
+            const data: FredApiResponse | EcosApiResponse = await res.json()
+
+            if (data.timeSeries.length > 0) {
+              const snap = buildSnapshot(id, data.timeSeries)
+              result[id] = { value: snap.value, change: snap.change }
+            }
+          } catch (err) {
+            console.warn(`[useMetricsCurrentValues] Failed to fetch ${id}, using mockData:`, err)
+
+            // Fallback to mock data
+            const mockData = isEcosMetric(id)
+              ? mockEcosSnapshots[id as EcosMetricId]
+              : mockSnapshots[id as FredMetricId]
+
+            if (mockData) {
+              result[id] = { value: mockData.value, change: mockData.change }
+            }
+          }
+        })
+      )
+
+      if (mounted) {
+        setValues(result)
+      }
     }
-  })
-  return result
+
+    if (metricIds.length > 0) {
+      fetchAllMetrics()
+    }
+
+    return () => {
+      mounted = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [metricIds.join(',')])
+
+  return values
 }

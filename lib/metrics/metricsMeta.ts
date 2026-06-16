@@ -9,8 +9,8 @@ export const metricsMeta: MetricMeta[] = [
   // === 금리·채권 ===
   {
     id: 'spread2y10y',
-    label: '2Y-10Y Spread',
-    labelKo: '장단기 금리차',
+    label: '2Y-10Y Spread (US)',
+    labelKo: '장단기 금리차 (미국)',
     unit: 'bp',
     tab: 'bonds',
     positiveIsGood: true,
@@ -34,8 +34,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'us2y',
-    label: 'US 2Y Yield',
-    labelKo: '미국 2년물 국채 수익률',
+    label: '2Y Yield (US)',
+    labelKo: '2년물 국채 (미국)',
     unit: '%',
     tab: 'bonds',
     positiveIsGood: true,
@@ -56,8 +56,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'us10y',
-    label: 'US 10Y Yield',
-    labelKo: '미국 10년물 국채 수익률',
+    label: '10Y Yield (US)',
+    labelKo: '10년물 국채 (미국)',
     unit: '%',
     tab: 'bonds',
     positiveIsGood: true,
@@ -79,8 +79,8 @@ export const metricsMeta: MetricMeta[] = [
   // === 유동성·크레딧 ===
   {
     id: 'hyOas',
-    label: 'HY OAS',
-    labelKo: '하이일드 스프레드',
+    label: 'HY OAS (US)',
+    labelKo: '하이일드 스프레드 (미국)',
     unit: 'bp',
     tab: 'liquidity',
     positiveIsGood: false,
@@ -102,8 +102,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'igOas',
-    label: 'IG OAS',
-    labelKo: '투자등급 스프레드',
+    label: 'IG OAS (US)',
+    labelKo: '투자등급 스프레드 (미국)',
     unit: 'bp',
     tab: 'liquidity',
     positiveIsGood: false,
@@ -123,8 +123,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'fedAssets',
-    label: 'Fed Assets',
-    labelKo: 'Fed 자산',
+    label: 'Fed Assets (US)',
+    labelKo: 'Fed 자산 (미국)',
     unit: '조달러',
     tab: 'liquidity',
     positiveIsGood: true,
@@ -143,8 +143,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'tga',
-    label: 'TGA',
-    labelKo: '재무부 계좌',
+    label: 'TGA (US)',
+    labelKo: '재무부 계좌 (미국)',
     unit: '억달러',
     tab: 'liquidity',
     positiveIsGood: false,
@@ -163,8 +163,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'rrp',
-    label: 'RRP',
-    labelKo: '역레포',
+    label: 'RRP (US)',
+    labelKo: '역레포 (미국)',
     unit: '억달러',
     tab: 'liquidity',
     positiveIsGood: false,
@@ -183,8 +183,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'netLiquidity',
-    label: 'Net Liquidity',
-    labelKo: '순유동성',
+    label: 'Net Liquidity (US)',
+    labelKo: '순유동성 (미국)',
     unit: '조달러',
     tab: 'liquidity',
     positiveIsGood: true,
@@ -207,8 +207,8 @@ export const metricsMeta: MetricMeta[] = [
   // === 원자재 ===
   {
     id: 'gold',
-    label: 'Gold',
-    labelKo: '금',
+    label: 'Gold (Global)',
+    labelKo: '금 (국제)',
     unit: '$/oz',
     tab: 'fx',
     positiveIsGood: true,
@@ -231,8 +231,8 @@ export const metricsMeta: MetricMeta[] = [
   // === 환율 ===
   {
     id: 'usdKrw',
-    label: 'USD/KRW',
-    labelKo: '달러-원 환율',
+    label: 'USD/KRW (KR)',
+    labelKo: '달러-원 환율 (한국)',
     unit: '원',
     tab: 'fx',
     positiveIsGood: false,  // 상승 = 원화 약세 = 나쁨
@@ -254,8 +254,8 @@ export const metricsMeta: MetricMeta[] = [
   // === 증시 ===
   {
     id: 'sp500',
-    label: 'S&P 500',
-    labelKo: 'S&P 500',
+    label: 'S&P 500 (US)',
+    labelKo: 'S&P 500 (미국)',
     unit: 'pt',
     tab: 'stocks',
     positiveIsGood: true,
@@ -275,8 +275,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'kospi',
-    label: 'KOSPI',
-    labelKo: 'KOSPI',
+    label: 'KOSPI (KR)',
+    labelKo: 'KOSPI (한국)',
     unit: 'pt',
     tab: 'stocks',
     positiveIsGood: true,
@@ -297,8 +297,8 @@ export const metricsMeta: MetricMeta[] = [
   // 기타 주요 지표들 (간략하게)
   {
     id: 'nasdaq',
-    label: 'NASDAQ',
-    labelKo: 'NASDAQ',
+    label: 'NASDAQ (US)',
+    labelKo: '나스닥 (미국)',
     unit: 'pt',
     tab: 'stocks',
     positiveIsGood: true,
@@ -310,8 +310,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'fedRate',
-    label: 'Fed Rate',
-    labelKo: '연준 기준금리',
+    label: 'Fed Rate (US)',
+    labelKo: '연준 기준금리 (미국)',
     unit: '%',
     tab: 'bonds',
     positiveIsGood: true,
@@ -325,7 +325,7 @@ export const metricsMeta: MetricMeta[] = [
   {
     id: 'cpiUs',
     label: 'CPI (US)',
-    labelKo: '미국 소비자물가지수',
+    labelKo: '소비자물가지수 (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: false,
@@ -338,7 +338,7 @@ export const metricsMeta: MetricMeta[] = [
   {
     id: 'pceUs',
     label: 'PCE (US)',
-    labelKo: '개인소비지출 물가지수',
+    labelKo: '개인소비지출 물가 (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: false,
@@ -350,8 +350,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'corePce',
-    label: 'Core PCE',
-    labelKo: '근원 PCE',
+    label: 'Core PCE (US)',
+    labelKo: '근원 PCE (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: false,
@@ -363,8 +363,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'trimmedPce',
-    label: 'Trimmed PCE',
-    labelKo: '절사평균 PCE',
+    label: 'Trimmed PCE (US)',
+    labelKo: '절사평균 PCE (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: false,
@@ -377,7 +377,7 @@ export const metricsMeta: MetricMeta[] = [
   {
     id: 'ppiUs',
     label: 'PPI (US)',
-    labelKo: '생산자물가지수',
+    labelKo: '생산자물가지수 (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: false,
@@ -389,8 +389,8 @@ export const metricsMeta: MetricMeta[] = [
 
   {
     id: 'unemployment',
-    label: 'Unemployment',
-    labelKo: '실업률',
+    label: 'Unemployment (US)',
+    labelKo: '실업률 (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: false,
@@ -403,7 +403,7 @@ export const metricsMeta: MetricMeta[] = [
   {
     id: 'gdpUs',
     label: 'GDP (US)',
-    labelKo: '미국 GDP 성장률',
+    labelKo: 'GDP 성장률 (미국)',
     unit: '%',
     tab: 'economic',
     positiveIsGood: true,
@@ -411,6 +411,137 @@ export const metricsMeta: MetricMeta[] = [
     interpretation: 'GDP 고성장 + 고인플레 → 긴축. GDP 저성장 + 저인플레 → 완화.',
     relationships: ['GDP↑ + CPI↑ → 긴축 국면'],
     chartConfig: { color: '#10b981' },
+  },
+
+  // === 한국 경제지표 (ECOS) ===
+  {
+    id: 'bokRate',
+    label: 'BOK Rate (KR)',
+    labelKo: '한국은행 기준금리 (한국)',
+    unit: '%',
+    tab: 'bonds',
+    positiveIsGood: true,
+    description: '한국은행 기준금리. 월별 금융통화위원회에서 결정.',
+    interpretation: 'Fed Rate 대비 금리차가 USD/KRW 환율에 영향. 금리 인상 시 원화 강세 압력.',
+    relationships: ['BOK Rate < Fed Rate → 자본 유출 압력', 'BOK Rate↑ → 원화 강세'],
+    chartConfig: { color: '#8b5cf6' },
+  },
+
+  {
+    id: 'kr3y',
+    label: '3Y Yield (KR)',
+    labelKo: '국고채 3년 (한국)',
+    unit: '%',
+    tab: 'bonds',
+    positiveIsGood: true,
+    description: '한국 국고채 3년물 수익률. 회사채 스프레드 계산의 기준금리.',
+    interpretation: '미국 2Y와 유사하게 단기 정책금리 기대를 반영. 회사채 스프레드 계산에 사용.',
+    relationships: ['KR 3Y ≈ BOK Rate 기대', 'KR 3Y - BOK Rate = 정책 기대 프리미엄'],
+    chartConfig: { color: '#06b6d4' },
+  },
+
+  {
+    id: 'kr10y',
+    label: '10Y Yield (KR)',
+    labelKo: '국고채 10년 (한국)',
+    unit: '%',
+    tab: 'bonds',
+    positiveIsGood: true,
+    description: '한국 국고채 10년물 수익률. 장기 성장 기대 반영.',
+    interpretation: 'US 10Y와 동행하지만 한국 경기 전망과 환율 변동성에 따라 괴리 발생.',
+    relationships: ['US 10Y↑ → KR 10Y↑ (글로벌 연동)', 'KR 10Y - KR 3Y = 장단기 스프레드'],
+    chartConfig: { color: '#3b82f6' },
+  },
+
+  {
+    id: 'krIgSpread',
+    label: 'IG Spread (KR)',
+    labelKo: 'IG 스프레드 (한국)',
+    unit: 'bp',
+    tab: 'liquidity',
+    positiveIsGood: false,
+    description: '한국 회사채 AA-등급과 국고채 3년의 스프레드. (AA- - KR3Y) × 100bp.',
+    interpretation: '한국 우량기업의 신용 프리미엄. 미국 IG OAS와 유사한 역할.',
+    relationships: ['KR IG Spread↑ → 신용시장 긴축', 'HY OAS↑ + KR IG Spread↑ → 글로벌 Risk Off'],
+    chartConfig: { color: '#f97316', referenceLines: [50, 100, 150] },
+  },
+
+  {
+    id: 'krHySpread',
+    label: 'HY Spread (KR)',
+    labelKo: 'HY 스프레드 (한국)',
+    unit: 'bp',
+    tab: 'liquidity',
+    positiveIsGood: false,
+    description: '한국 회사채 BBB-등급과 국고채 3년의 스프레드. (BBB- - KR3Y) × 100bp.',
+    interpretation: '한국 고위험 기업의 신용 프리미엄. 미국 HY OAS와 유사한 역할.',
+    relationships: ['KR HY Spread↑ → 한국 신용위험 증가', '급등 시 KOSPI 압박 신호'],
+    chartConfig: { color: '#f59e0b', referenceLines: [200, 400, 600] },
+  },
+
+  {
+    id: 'krCorpAA',
+    label: 'Corp AA- (KR)',
+    labelKo: '회사채 AA- (한국)',
+    unit: '%',
+    tab: 'bonds',
+    positiveIsGood: false,
+    description: '한국 회사채 AA-등급 3년물 수익률. 우량기업 조달금리.',
+    interpretation: 'AA- 회사채는 한국 우량기업의 자금조달 비용. 국고채 대비 스프레드가 신용 리스크.',
+    relationships: ['AA- ↑ 급등 → 기업 자금조달 어려움', 'AA- - KR 3Y = IG Spread'],
+    chartConfig: { color: '#8b5cf6' },
+  },
+
+  {
+    id: 'krCorpBBB',
+    label: 'Corp BBB- (KR)',
+    labelKo: '회사채 BBB- (한국)',
+    unit: '%',
+    tab: 'bonds',
+    positiveIsGood: false,
+    description: '한국 회사채 BBB-등급 3년물 수익률. 고위험 기업 조달금리.',
+    interpretation: 'BBB- 회사채는 한국 고위험 기업의 자금조달 비용. 급등 시 부도 위험 증가.',
+    relationships: ['BBB- ↑ 급등 → 기업 부도 위험 증가', 'BBB- - KR 3Y = HY Spread'],
+    chartConfig: { color: '#f59e0b' },
+  },
+
+  {
+    id: 'cpiKr',
+    label: 'CPI (KR)',
+    labelKo: '소비자물가지수 (한국)',
+    unit: '% YoY',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: '한국 소비자물가지수 전년 대비 상승률. 한국은행 기준금리 결정의 핵심 지표.',
+    interpretation: 'CPI 2% 초과 지속 시 BOK 긴축 압력. 1% 이하 시 완화 압력.',
+    relationships: ['CPI KR↑ → BOK Rate↑ 압력', 'CPI US↑ → CPI KR↑ (수입 물가 전이)'],
+    chartConfig: { color: '#ef4444', referenceLines: [2] },
+  },
+
+  {
+    id: 'unemploymentKr',
+    label: 'Unemployment (KR)',
+    labelKo: '실업률 (한국)',
+    unit: '%',
+    tab: 'economic',
+    positiveIsGood: false,
+    description: '한국 실업률. 경기 후행지표.',
+    interpretation: '3% 이하 양호, 4% 이상 경기 둔화 신호. 미국과 달리 변동성이 작음.',
+    relationships: ['실업률↑ → BOK 완화 압력', 'GDP↓ → 실업률↑ (후행)'],
+    chartConfig: { color: '#6366f1', referenceLines: [3, 4] },
+  },
+
+  {
+    id: 'krFxReserves',
+    label: 'FX Reserves (KR)',
+    labelKo: '외환보유액 (한국)',
+    unit: '억달러',
+    tab: 'liquidity',
+    positiveIsGood: true,
+    description: '한국은행이 보유한 외환보유액. 월별 발표.',
+    interpretation: '외환위기 대응 능력의 지표. 감소 추세는 외환 유출 또는 환율 방어 개입 신호.',
+    relationships: ['외환보유액↓ 급락 → 환율 방어 개입 중', 'USD/KRW↑ + 외환보유액↓ → 외환 위기 신호'],
+    chartConfig: { color: '#10b981', referenceLines: [4000] },
   },
 ];
 

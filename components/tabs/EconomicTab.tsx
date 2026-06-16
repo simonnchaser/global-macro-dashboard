@@ -12,7 +12,7 @@ interface EconomicTabProps {
 }
 
 export default function EconomicTab({ onMetricClick }: EconomicTabProps) {
-  const economicMetrics = ['cpiUs', 'pceUs', 'corePce', 'trimmedPce', 'ppiUs', 'unemployment', 'gdpUs'] as const;
+  const economicMetrics = ['cpiUs', 'pceUs', 'corePce', 'trimmedPce', 'ppiUs', 'unemployment', 'gdpUs', 'cpiKr', 'unemploymentKr'] as const;
 
   return (
     <div className="pt-4 px-6 pb-8">
