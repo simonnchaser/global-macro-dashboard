@@ -43,7 +43,7 @@ export interface TimeSeriesPoint {
 }
 
 export interface MetricSnapshot {
-  id: FredMetricId
+  id: FredMetricId | YahooMetricId | EcosMetricId
   value: number
   change: number
   changePercent: number

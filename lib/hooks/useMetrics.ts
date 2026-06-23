@@ -45,7 +45,7 @@ function buildSnapshot(
     value:         latest.value,
     change:        Math.round(change * 1000) / 1000,
     changePercent: Math.round(changePercent * 100) / 100,
-    updatedAt:     latest.time,
+    updatedAt:     (typeof latest.time === 'string' ? latest.time : new Date(latest.time * 1000).toISOString()),
   }
 }
 
@@ -91,7 +91,7 @@ export function useMetricSnapshot(
           : isEcosMetric(id)
           ? mockEcosSnapshots[id as EcosMetricId]
           : mockSnapshots[id as FredMetricId]
-        setSnapshot(mockData)
+        if (mockData) setSnapshot(mockData)
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         if (mounted) {

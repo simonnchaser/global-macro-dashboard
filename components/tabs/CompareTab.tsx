@@ -63,7 +63,7 @@ function CompareChartItem({
     });
 
     const filteredData = filterDataByPeriod(timeSeriesData, period);
-    lineSeries.setData(filteredData);
+    lineSeries.setData(filteredData as any);
 
     chart.timeScale().fitContent();
 

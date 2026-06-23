@@ -20,8 +20,8 @@ function AlarmCard({ alarm }: { alarm: UserAlarm }) {
 
   // 알람 조건 체크
   const isTriggered =
-    (alarm.condition === 'above' && currentData.value >= alarm.threshold) ||
-    (alarm.condition === 'below' && currentData.value <= alarm.threshold);
+    (alarm.condition.type === 'above' && currentData.value >= alarm.condition.threshold) ||
+    (alarm.condition.type === 'below' && currentData.value <= alarm.condition.threshold);
 
   return (
     <>
@@ -56,7 +56,7 @@ function AlarmCard({ alarm }: { alarm: UserAlarm }) {
         <div className="flex items-center gap-2 mb-3">
           <span className="text-sm text-slate-400">조건:</span>
           <span className="text-sm font-mono text-slate-200">
-            {alarm.condition === 'above' ? '≥' : '≤'} {alarm.threshold}
+            {alarm.condition.type === 'above' ? '≥' : '≤'} {alarm.condition.threshold}
           </span>
           {alarm.isActive && isTriggered && (
             <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded font-semibold animate-pulse">

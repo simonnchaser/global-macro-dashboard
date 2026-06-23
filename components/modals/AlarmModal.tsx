@@ -16,8 +16,12 @@ interface AlarmModalProps {
 
 export default function AlarmModal({ alarm, onSave, onClose }: AlarmModalProps) {
   const [metricId, setMetricId] = useState<MetricId | ''>(alarm?.metricId || '');
-  const [condition, setCondition] = useState<'above' | 'below'>(alarm?.condition || 'above');
-  const [threshold, setThreshold] = useState(alarm?.threshold?.toString() || '');
+  const [conditionType, setConditionType] = useState<'above' | 'below'>(
+    alarm?.condition.type === 'above' || alarm?.condition.type === 'below'
+      ? alarm.condition.type
+      : 'above'
+  );
+  const [threshold, setThreshold] = useState(alarm?.condition.threshold?.toString() || '');
 
   // 모달이 열렸을 때 배경 스크롤 막기
   useEffect(() => {
@@ -39,8 +43,13 @@ export default function AlarmModal({ alarm, onSave, onClose }: AlarmModalProps) 
     onSave({
       metricId,
       metricLabel: metric.label,
-      condition,
-      threshold: parseFloat(threshold),
+      condition: {
+        type: conditionType,
+        threshold: parseFloat(threshold),
+      },
+      level: 'info',
+      memo: '',
+      createdAt: new Date().toISOString(),
       isActive: alarm?.isActive ?? true,
     });
   };
@@ -97,9 +106,9 @@ export default function AlarmModal({ alarm, onSave, onClose }: AlarmModalProps) 
             </label>
             <div className="flex gap-3">
               <button
-                onClick={() => setCondition('above')}
+                onClick={() => setConditionType('above')}
                 className={`flex-1 px-4 py-2 rounded border transition-colors ${
-                  condition === 'above'
+                  conditionType === 'above'
                     ? 'bg-[#3b82f6] border-[#3b82f6] text-white'
                     : 'bg-[#0f1117] border-[#2d3748] text-slate-400 hover:border-[#3b82f6]'
                 }`}
@@ -107,9 +116,9 @@ export default function AlarmModal({ alarm, onSave, onClose }: AlarmModalProps) 
                 이상 (≥)
               </button>
               <button
-                onClick={() => setCondition('below')}
+                onClick={() => setConditionType('below')}
                 className={`flex-1 px-4 py-2 rounded border transition-colors ${
-                  condition === 'below'
+                  conditionType === 'below'
                     ? 'bg-[#3b82f6] border-[#3b82f6] text-white'
                     : 'bg-[#0f1117] border-[#2d3748] text-slate-400 hover:border-[#3b82f6]'
                 }`}
@@ -140,7 +149,7 @@ export default function AlarmModal({ alarm, onSave, onClose }: AlarmModalProps) 
               <div className="font-semibold mb-1">알람 조건:</div>
               <div>
                 {allMetrics.find((m) => m.id === metricId)?.label}{' '}
-                {condition === 'above' ? '≥' : '≤'} {threshold}
+                {conditionType === 'above' ? '≥' : '≤'} {threshold}
               </div>
             </div>
           )}

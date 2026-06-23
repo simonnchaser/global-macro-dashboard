@@ -136,7 +136,7 @@ async function handleSpreadCalculation(period: string) {
       metricId: 'spread2y10y',
       timeSeries,
       latestValue: latest?.value ?? 0,
-      latestDate: latest?.time ?? '',
+      latestDate: (typeof latest?.time === 'string' ? latest.time : '') ?? '',
     }
 
     return NextResponse.json(response)
@@ -238,7 +238,7 @@ async function handleNetLiquidityCalculation(period: string) {
       metricId: 'netLiquidity',
       timeSeries,
       latestValue: latest?.value ?? 0,
-      latestDate: latest?.time ?? '',
+      latestDate: (typeof latest?.time === 'string' ? latest.time : '') ?? '',
     }
 
     return NextResponse.json(response)

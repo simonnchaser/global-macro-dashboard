@@ -18,7 +18,7 @@ export const mockSnapshots: Record<FredMetricId, MetricSnapshot> = {
   gdpUs:        { id: 'gdpUs',        value: 2.4,   change: -0.1,  changePercent: 0,     updatedAt: '2026-06-11' },
   spread2y10y:  { id: 'spread2y10y',  value: -0.13, change: -0.02, changePercent: 0,     updatedAt: '2026-06-11' },
   netLiquidity: { id: 'netLiquidity', value: 5.58,  change: +0.05, changePercent: +0.90, updatedAt: '2026-06-11' },
-}
+} as const
 
 // Yahoo Finance 지표 mock data (증시, 국제환율, 원자재)
 export const mockYahooSnapshots: Record<YahooMetricId, MetricSnapshot> = {

@@ -70,7 +70,7 @@ const generateSpreadTimeSeries = (): TimeSeriesDataPoint[] => {
   return data;
 };
 
-export const mockTimeSeriesData: Record<MetricId, TimeSeriesDataPoint[]> = {
+export const mockTimeSeriesData: Partial<Record<MetricId, TimeSeriesDataPoint[]>> = {
   // 증시
   sp500: generateDummyTimeSeries(4950, 0.015),
   nasdaq: generateDummyTimeSeries(15620, 0.02),

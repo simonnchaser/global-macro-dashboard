@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       metricId,
       timeSeries,
       latestValue: latest?.value ?? 0,
-      latestDate:  latest?.time  ?? '',
+      latestDate:  (typeof latest?.time === 'string' ? latest.time : '') ?? '',
     }
 
     return NextResponse.json(response)
@@ -143,7 +143,7 @@ async function handleKrSpread3y10y(period: string, apiKey: string) {
       metricId: 'krSpread3y10y',
       timeSeries,
       latestValue: latest?.value ?? 0,
-      latestDate: latest?.time ?? '',
+      latestDate: (typeof latest?.time === 'string' ? latest.time : '') ?? '',
     }
 
     return NextResponse.json(response)
@@ -186,7 +186,7 @@ async function handleKrSpread(
       metricId,
       timeSeries,
       latestValue: latest?.value ?? 0,
-      latestDate: latest?.time ?? '',
+      latestDate: (typeof latest?.time === 'string' ? latest.time : '') ?? '',
     }
 
     return NextResponse.json(response)

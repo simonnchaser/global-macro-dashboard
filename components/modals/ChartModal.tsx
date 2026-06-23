@@ -5,7 +5,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { createChart, ColorType, LineSeries, AreaSeries } from 'lightweight-charts';
+import { createChart, ColorType, LineSeries, AreaSeries, type UTCTimestamp } from 'lightweight-charts';
 import type { MetricId } from '@/lib/metrics/metricsTypes';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
 import { useMetricCurrentValue, useMetricTimeSeries } from '@/lib/hooks/useMetrics';

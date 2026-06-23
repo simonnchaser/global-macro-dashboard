@@ -2,7 +2,8 @@ import type { FredMetricId } from '@/lib/types/metrics'
 
 // 환율·원자재는 Yahoo Finance로 이전
 // FRED는 금리·채권, 유동성, 경제지표만 담당
-export const FRED_SERIES: Record<FredMetricId, string> = {
+// spread2y10y, netLiquidity는 계산 지표로 여기에 포함하지 않음
+export const FRED_SERIES: Partial<Record<FredMetricId, string>> = {
   fedRate:      'FEDFUNDS',
   us2y:         'DGS2',
   us10y:        'DGS10',
