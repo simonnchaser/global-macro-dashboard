@@ -5,6 +5,7 @@
 
 'use client';
 
+import { useEffect } from 'react';
 import type { MetricId, TabId } from '@/lib/metrics/metricsTypes';
 import { allMetrics } from '@/lib/metrics/metricsMeta';
 
@@ -21,6 +22,13 @@ export default function MetricSelectorModal({
   onClose,
   selectedMetrics = [],
 }: MetricSelectorModalProps) {
+  // 모달이 열렸을 때 배경 스크롤 막기
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
   // 탭별로 지표 그룹화
   const metricsByTab: Record<TabId, typeof allMetrics> = {
     stocks: [],

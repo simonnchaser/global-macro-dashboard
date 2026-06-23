@@ -27,8 +27,8 @@ export default function TopBar() {
   };
 
   return (
-    <div className="bg-[#161b27] border-b border-[#2d3748] fixed top-0 left-0 right-0 z-50 py-3">
-      <div className="relative px-6">
+    <div className="bg-[#161b27] border-b border-[#2d3748] fixed top-0 left-0 right-0 z-50 h-[60px]">
+      <div className="relative px-6 h-full flex items-center">
         {/* 좌측 스크롤 버튼 */}
         <button
           onClick={() => scroll('left')}
@@ -50,14 +50,18 @@ export default function TopBar() {
 
             if (!meta || !data) return null;
 
-            const isPositive = data.change !== null && data.change > 0;
-            const changeColor = meta.positiveIsGood
-              ? isPositive
-                ? 'text-[#22c55e]'
-                : 'text-[#ef4444]'
-              : isPositive
-              ? 'text-[#ef4444]'
-              : 'text-[#22c55e]';
+            // 단순 색상 로직: change 값 기준 (MetricCard와 동일)
+            const valueColor = data.change > 0
+              ? 'text-green-400'
+              : data.change < 0
+              ? 'text-red-400'
+              : 'text-slate-200';
+
+            const changeColor = data.change > 0
+              ? 'text-green-400'
+              : data.change < 0
+              ? 'text-red-400'
+              : 'text-slate-400';
 
             return (
               <div key={metricId} className="flex items-center gap-3 flex-shrink-0 group relative">
@@ -74,7 +78,7 @@ export default function TopBar() {
                   {meta.label}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="text-lg font-mono font-semibold text-slate-200 whitespace-nowrap">
+                  <div className={`text-lg font-mono font-semibold ${valueColor} whitespace-nowrap`}>
                     {data.value.toLocaleString()}{meta.unit}
                   </div>
                   {data.change !== null && (

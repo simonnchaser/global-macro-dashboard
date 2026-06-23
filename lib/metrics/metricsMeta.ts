@@ -228,15 +228,153 @@ export const metricsMeta: MetricMeta[] = [
     },
   },
 
+  {
+    id: 'silver',
+    label: 'Silver (Global)',
+    labelKo: '은 (국제)',
+    unit: '$/oz',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '은 현물 가격. 화폐 금속이자 산업 원자재의 이중 성격.',
+    interpretation:
+      '금과 유사하게 안전자산 역할을 하지만, 산업 수요(태양광, 전자기기)가 50% 이상. ' +
+      '경기 회복기에는 금보다 더 강한 상승을 보이고(금은비 하락), 위기 시에는 금보다 더 빠르게 하락.',
+    relationships: [
+      '실질금리↓ → 은↑ (금과 동행)',
+      '경기 확장기 → 산업 수요↑ → 은↑↑',
+      '금은비(Gold/Silver) 90 이상 → 은 저평가 신호',
+      'DXY↑ → 은↓ (달러 표시 원자재)',
+    ],
+    chartConfig: {
+      color: '#94a3b8',
+    },
+  },
+
+  {
+    id: 'wti',
+    label: 'WTI Crude (Global)',
+    labelKo: 'WTI 원유 (국제)',
+    unit: '$/barrel',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '미국산 경질유 (WTI). 미국 원유 가격의 벤치마크.',
+    interpretation:
+      '미국 셰일오일 생산량과 OPEC+ 공급 정책에 민감. ' +
+      '원유 가격은 인플레이션의 선행지표. WTI 급등 → PPI↑ → CPI↑ 전이. ' +
+      '브렌트유와 일반적으로 동행하지만 미국 재고·생산량에 따라 괴리 발생.',
+    relationships: [
+      'WTI↑ → PPI↑ → CPI↑ (인플레 압력)',
+      'WTI↑ 급등 → 소비 위축 → 경기 둔화 리스크',
+      'DXY↑ → WTI↓ (달러 표시 원자재)',
+      'OPEC+ 감산 → WTI↑',
+    ],
+    chartConfig: {
+      color: '#f97316',
+    },
+  },
+
+  {
+    id: 'brent',
+    label: 'Brent Crude (Global)',
+    labelKo: '브렌트유 (국제)',
+    unit: '$/barrel',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '북해산 원유 (Brent). 글로벌 원유 가격의 국제 벤치마크.',
+    interpretation:
+      'WTI보다 글로벌 수급 반영. 유럽·아시아 원유 거래의 기준. ' +
+      '일반적으로 WTI보다 배럴당 3~5달러 높게 형성 (운송비·품질 프리미엄). ' +
+      '중동 지정학 리스크에 WTI보다 민감.',
+    relationships: [
+      'Brent↑ → 글로벌 인플레 압력',
+      '중동 위기 → Brent 급등',
+      'Brent - WTI Spread 확대 → 미국 원유 공급↑ 신호',
+      'DXY↑ → Brent↓',
+    ],
+    chartConfig: {
+      color: '#ea580c',
+    },
+  },
+
+  {
+    id: 'natgas',
+    label: 'Natural Gas (US)',
+    labelKo: '천연가스 (미국)',
+    unit: '$/MMBtu',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '미국 천연가스 현물 가격. 난방·발전 연료.',
+    interpretation:
+      '계절성이 강한 에너지 원자재. 겨울(난방 수요)과 여름(냉방 발전)에 급등. ' +
+      '원유와 달리 저장·운송이 어려워 지역별 가격 차이 큼. ' +
+      '셰일가스 혁명 이후 미국은 천연가스 순수출국.',
+    relationships: [
+      '동절기(11~2월) → 난방 수요↑ → natgas↑',
+      '하절기(7~8월) → 발전 수요↑ → natgas↑',
+      '천연가스↑ 급등 → 전기요금↑ → 소비자물가↑',
+      '유럽 천연가스 위기 → LNG 수출↑ → 미국 natgas↑',
+    ],
+    chartConfig: {
+      color: '#14b8a6',
+    },
+  },
+
+  {
+    id: 'copper',
+    label: 'Copper (Global)',
+    labelKo: '구리 (국제)',
+    unit: '$/MT',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '구리 선물 가격. "경제학 박사 학위를 가진 금속".',
+    interpretation:
+      '건설·제조·전력 등 모든 산업에 필수. 글로벌 경기의 가장 정확한 선행지표. ' +
+      '구리 급락은 평균 3~6개월 후 경기 둔화로 이어지는 패턴. ' +
+      '중국 수요가 전체의 50% 이상. 중국 부동산·인프라 투자와 직결.',
+    relationships: [
+      '구리↑ → 글로벌 경기 확장 신호',
+      '구리↓ 급락 → 침체 선행 경고',
+      '중국 인프라 투자↑ → 구리↑',
+      '구리/금 비율↑ → Risk On (성장 우선)',
+      '구리/금 비율↓ → Risk Off (안전자산 선호)',
+    ],
+    chartConfig: {
+      color: '#c2410c',
+    },
+  },
+
+  {
+    id: 'gasPrice',
+    label: 'US Gas Price (US)',
+    labelKo: '미국 휘발유 가격 (미국)',
+    unit: '$/gallon',
+    tab: 'fx',
+    positiveIsGood: false,
+    description: '미국 평균 휘발유 소매가격 (갤런당). 소비자 체감 인플레이션의 최전선.',
+    interpretation:
+      '소비자가 가장 자주 접하는 가격. 정치적으로 민감한 지표. ' +
+      '휘발유 가격 급등 → 소비자 심리 악화 → 소비 위축. ' +
+      'WTI 원유 + 정제 마진 + 유통비용으로 구성. 원유보다 2~4주 후행.',
+    relationships: [
+      'WTI↑ → 2~4주 후 휘발유↑',
+      '휘발유 $4 초과 → 소비자 심리 급격 악화',
+      '휘발유↑ → CPI↑ (교통비 항목 직접 반영)',
+      '대선 전 → 정부 비축유 방출 → 휘발유↓ 시도',
+    ],
+    chartConfig: {
+      color: '#dc2626',
+    },
+  },
+
   // === 환율 ===
   {
     id: 'usdKrw',
-    label: 'USD/KRW (KR)',
-    labelKo: '달러-원 환율 (한국)',
+    label: 'USD/KRW',
+    labelKo: '달러/원',
     unit: '원',
     tab: 'fx',
     positiveIsGood: false,  // 상승 = 원화 약세 = 나쁨
-    description: '달러-원 환율. 상승 = 원화 약세.',
+    description: '달러-원 환율 (매매기준율). 상승 = 원화 약세.',
     interpretation:
       '외국인 수급과 함께 보는 것이 핵심. ' +
       '외국인 순매도 + USD/KRW 상승 = 악순환 루프. ' +
@@ -248,6 +386,153 @@ export const metricsMeta: MetricMeta[] = [
     ],
     chartConfig: {
       color: '#ef4444',
+    },
+  },
+
+  {
+    id: 'eurKrw',
+    label: 'EUR/KRW',
+    labelKo: '유로/원',
+    unit: '원',
+    tab: 'fx',
+    positiveIsGood: false,
+    description: '유로-원 환율. EUR/USD × USD/KRW와 동행.',
+    interpretation:
+      '유로존 통화정책과 경기 전망을 반영. ' +
+      'ECB 긴축 시 유로 강세, 완화 시 유로 약세.',
+    relationships: [
+      'ECB 긴축 → EUR 강세 → EUR/KRW↑',
+      'EUR/USD↑ + USD/KRW↑ → EUR/KRW↑↑',
+      '유로존 경기↓ → EUR 약세',
+    ],
+    chartConfig: {
+      color: '#f59e0b',
+    },
+  },
+
+  {
+    id: 'jpyKrw',
+    label: 'JPY/KRW',
+    labelKo: '엔/원 (100엔)',
+    unit: '원',
+    tab: 'fx',
+    positiveIsGood: false,
+    description: '100엔당 원화 환율. 엔캐리 트레이드와 밀접.',
+    interpretation:
+      'JPY 약세(JPY/KRW↓) → 엔캐리 활성화 → 글로벌 위험자산 우호적. ' +
+      'JPY 강세(JPY/KRW↑) → 엔캐리 청산 → 위험자산 급락.',
+    relationships: [
+      'JPY 약세 → 엔캐리 활성화 → 주가↑',
+      'JPY 급등 → 엔캐리 청산 → 주가 급락',
+      'BOJ 정책 정상화 → JPY 강세',
+    ],
+    chartConfig: {
+      color: '#06b6d4',
+    },
+  },
+
+  {
+    id: 'cnyKrw',
+    label: 'CNY/KRW',
+    labelKo: '위안/원',
+    unit: '원',
+    tab: 'fx',
+    positiveIsGood: false,
+    description: '위안-원 환율. 중국 경기와 수출 경쟁력 지표.',
+    interpretation:
+      '위안 약세(CNY/KRW↓) → 한국 수출 경쟁력↓ + 중국 경기 우려. ' +
+      '중국은 한국 최대 교역국으로 위안 동향이 KOSPI에 직접 영향.',
+    relationships: [
+      'CNY 약세 → 한국 수출 경쟁력↓',
+      'CNY 약세 + 중국 경기↓ → KOSPI↓ 이중 타격',
+      'USD/CNY↑ → CNY 약세 신호',
+    ],
+    chartConfig: {
+      color: '#ec4899',
+    },
+  },
+
+  {
+    id: 'dxy',
+    label: 'DXY',
+    labelKo: '달러인덱스',
+    unit: '지수',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '달러 강도 지수. EUR(57%), JPY(14%), GBP(12%) 등 6개 통화 대비.',
+    interpretation:
+      '글로벌 달러 강도의 기준. DXY↑ = 달러 강세 = 신흥국 통화 약세. ' +
+      'Fed 긴축 기대 시 상승, 완화 기대 시 하락.',
+    relationships: [
+      'DXY↑ → USD/KRW↑ (신흥국 통화 약세)',
+      'DXY↑ → 원자재 가격↓ (달러 표시)',
+      'Fed 긴축 기대 → DXY↑',
+    ],
+    chartConfig: {
+      color: '#10b981',
+    },
+  },
+
+  {
+    id: 'eurUsd',
+    label: 'EUR/USD',
+    labelKo: '유로/달러',
+    unit: 'USD',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: 'DXY의 57%를 차지하는 가장 영향력 있는 환율.',
+    interpretation:
+      'EUR/USD↑ = 유로 강세 = DXY↓. ' +
+      'ECB vs Fed 금리 차이가 핵심. ECB 긴축 시 유로 강세.',
+    relationships: [
+      'EUR/USD↑ → DXY↓ (역상관)',
+      'ECB 긴축 > Fed 긴축 → EUR 강세',
+      'EUR 강세 → 유로존 수출↓',
+    ],
+    chartConfig: {
+      color: '#8b5cf6',
+    },
+  },
+
+  {
+    id: 'usdJpy',
+    label: 'USD/JPY',
+    labelKo: '달러/엔',
+    unit: 'JPY',
+    tab: 'fx',
+    positiveIsGood: true,
+    description: '달러당 엔화. 엔캐리 트레이드의 핵심 지표.',
+    interpretation:
+      'USD/JPY↑ = 엔 약세 → 엔캐리 활성화 → 글로벌 위험자산 우호적. ' +
+      'BOJ 정책 정상화 시 엔 강세 → 엔캐리 청산 위험.',
+    relationships: [
+      'USD/JPY↑ → 엔캐리 활성화 → 주가↑',
+      'USD/JPY 급락 → 엔캐리 청산 → 주가 급락',
+      'BOJ YCC 폐지 → 엔 강세',
+    ],
+    chartConfig: {
+      color: '#f97316',
+    },
+  },
+
+  {
+    id: 'usdCny',
+    label: 'USD/CNY',
+    labelKo: '달러/위안',
+    unit: 'CNY',
+    tab: 'fx',
+    positiveIsGood: false,
+    description: '달러당 위안. 중국 경기와 PBOC 정책 반영.',
+    interpretation:
+      'USD/CNY↑ = 위안 약세 → 중국 경기 우려 또는 자본 유출. ' +
+      'PBOC가 7.0~7.3 범위로 관리. 7.3 돌파 시 위기 신호.',
+    relationships: [
+      'USD/CNY↑ → 중국 경기 우려 → KOSPI↓',
+      'USD/CNY > 7.3 → 위안 방어 실패 신호',
+      '위안 약세 → 한국 수출 경쟁력↓',
+    ],
+    chartConfig: {
+      color: '#dc2626',
     },
   },
 
@@ -454,6 +739,28 @@ export const metricsMeta: MetricMeta[] = [
   },
 
   {
+    id: 'krSpread3y10y',
+    label: '3Y-10Y Spread (KR)',
+    labelKo: '장단기 금리차 (한국)',
+    unit: 'bp',
+    tab: 'bonds',
+    positiveIsGood: true,
+    description: '한국 10년물과 3년물 국고채 수익률의 차이. 10Y - 3Y로 계산.',
+    interpretation:
+      '미국의 2Y-10Y Spread와 유사한 역할. 한국은 3년물이 가장 유동성이 높은 벤치마크다. ' +
+      '정상 상태에서는 양수. 스프레드 축소는 경기 둔화 우려를 반영.',
+    relationships: [
+      'KR 3Y↑ 빠르게 → BOK 인상 기대 강해지는 중',
+      'KR 10Y↑ 느리게 → 장기 성장 기대는 아직 유지',
+      'Spread 축소 → 경기 둔화 또는 BOK 인하 기대',
+    ],
+    chartConfig: {
+      color: '#8b5cf6',
+      referenceLines: [0],
+    },
+  },
+
+  {
     id: 'krIgSpread',
     label: 'IG Spread (KR)',
     labelKo: 'IG 스프레드 (한국)',
@@ -529,6 +836,45 @@ export const metricsMeta: MetricMeta[] = [
     interpretation: '3% 이하 양호, 4% 이상 경기 둔화 신호. 미국과 달리 변동성이 작음.',
     relationships: ['실업률↑ → BOK 완화 압력', 'GDP↓ → 실업률↑ (후행)'],
     chartConfig: { color: '#6366f1', referenceLines: [3, 4] },
+  },
+
+  {
+    id: 'gdpKr',
+    label: 'GDP Growth (KR)',
+    labelKo: 'GDP 성장률 (한국)',
+    unit: '% QoQ',
+    tab: 'economic',
+    positiveIsGood: true,
+    description: '한국 실질 GDP 성장률 (전분기 대비). 분기별 발표.',
+    interpretation: '2% 이상 양호, 0~1% 성장 둔화, 음수 기술적 침체. 수출 의존 경제로 글로벌 경기에 민감.',
+    relationships: ['GDP↑ → BOK 인상 압력', '수출↓ → GDP↓', '중국 경기↓ → 한국 GDP↓'],
+    chartConfig: { color: '#10b981', referenceLines: [0, 2], negativeZoneColor: 'rgba(239, 68, 68, 0.15)' },
+  },
+
+  {
+    id: 'ppiKr',
+    label: 'PPI (KR)',
+    labelKo: '생산자물가지수 (한국)',
+    unit: '% YoY',
+    tab: 'economic',
+    positiveIsGood: true,
+    description: '한국 생산자물가지수 (전년 동월 대비). 월별 발표.',
+    interpretation: 'CPI 선행지표. PPI 상승 → 수개월 후 CPI 상승 압력. 원자재·에너지 가격에 민감.',
+    relationships: ['PPI↑ → CPI↑ (선행)', '원유↑ → PPI↑', 'PPI급등 → BOK 인상 압력'],
+    chartConfig: { color: '#f59e0b', referenceLines: [0, 2] },
+  },
+
+  {
+    id: 'industrialKr',
+    label: 'Industrial Production (KR)',
+    labelKo: '산업생산지수 (한국)',
+    unit: '지수',
+    tab: 'economic',
+    positiveIsGood: true,
+    description: '한국 산업생산지수 (계절조정, 2015=100). 월별 발표.',
+    interpretation: '제조업 중심 경제의 핵심 지표. 전월 대비 증가 → 경기 확장, 감소 → 경기 둔화.',
+    relationships: ['산업생산↑ → GDP↑ (선행)', '수출↓ → 산업생산↓', '반도체 사이클과 강한 상관'],
+    chartConfig: { color: '#06b6d4', referenceLines: [] },
   },
 
   {

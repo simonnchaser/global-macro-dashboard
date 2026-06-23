@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { MetricId, UserAlarm } from '@/lib/metrics/metricsTypes';
 import { allMetrics } from '@/lib/metrics/metricsMeta';
 
@@ -18,6 +18,14 @@ export default function AlarmModal({ alarm, onSave, onClose }: AlarmModalProps) 
   const [metricId, setMetricId] = useState<MetricId | ''>(alarm?.metricId || '');
   const [condition, setCondition] = useState<'above' | 'below'>(alarm?.condition || 'above');
   const [threshold, setThreshold] = useState(alarm?.threshold?.toString() || '');
+
+  // 모달이 열렸을 때 배경 스크롤 막기
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleSave = () => {
     if (!metricId || !threshold) {

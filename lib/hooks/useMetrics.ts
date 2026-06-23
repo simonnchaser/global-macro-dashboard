@@ -1,17 +1,33 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { FredMetricId, MetricSnapshot, TimeSeriesPoint, FredApiResponse, EcosMetricId, EcosMetricSnapshot, EcosApiResponse } from '@/lib/types/metrics'
-import { mockSnapshots, mockEcosSnapshots } from '@/lib/mock/mockData'
+import type { FredMetricId, MetricSnapshot, TimeSeriesPoint, FredApiResponse, EcosMetricId, EcosMetricSnapshot, EcosApiResponse, YahooMetricId, YahooApiResponse } from '@/lib/types/metrics'
+import { mockSnapshots, mockEcosSnapshots, mockYahooSnapshots } from '@/lib/mock/mockData'
 import { ECOS_CALCULATED } from '@/lib/api/ecos'
 
 // 지표 ID가 ECOS인지 판단
 function isEcosMetric(id: string): id is EcosMetricId {
   const ecosMetrics: EcosMetricId[] = [
     'bokRate', 'kr3y', 'kr10y', 'cpiKr', 'unemploymentKr',
-    'krCorpAA', 'krCorpBBB', 'krFxReserves', 'krIgSpread', 'krHySpread'
+    'krCorpAA', 'krCorpBBB', 'krFxReserves',
+    'gdpKr', 'ppiKr', 'industrialKr',
+    'usdKrw', 'eurKrw', 'jpyKrw', 'cnyKrw',
+    'krSpread3y10y', 'krIgSpread', 'krHySpread'
   ]
   return ecosMetrics.includes(id as EcosMetricId)
+}
+
+// 지표 ID가 Yahoo Finance인지 판단
+function isYahooMetric(id: string): id is YahooMetricId {
+  const yahooMetrics: YahooMetricId[] = [
+    // 증시
+    'sp500', 'nasdaq', 'kospi', 'kosdaq',
+    // 국제 환율
+    'dxy', 'eurUsd', 'usdJpy', 'usdCny',
+    // 원자재
+    'gold', 'silver', 'wti', 'brent', 'natgas', 'copper'
+  ]
+  return yahooMetrics.includes(id as YahooMetricId)
 }
 
 function buildSnapshot(
@@ -50,11 +66,11 @@ export function useMetricSnapshot(
 
       try {
         // API endpoint 결정
-        const apiEndpoint = isEcosMetric(id) ? 'ecos' : 'fred'
+        const apiEndpoint = isYahooMetric(id) ? 'yahoo' : isEcosMetric(id) ? 'ecos' : 'fred'
         const res = await fetch(`/api/${apiEndpoint}?metricId=${id}&period=${period}`)
         if (!res.ok) throw new Error(`API error: ${res.status}`)
 
-        const data: FredApiResponse | EcosApiResponse = await res.json()
+        const data: FredApiResponse | EcosApiResponse | YahooApiResponse = await res.json()
 
         if (!mounted) return
 
@@ -70,7 +86,11 @@ export function useMetricSnapshot(
         if (!mounted) return
 
         // Fallback to appropriate mock data
-        const mockData = isEcosMetric(id) ? mockEcosSnapshots[id as EcosMetricId] : mockSnapshots[id as FredMetricId]
+        const mockData = isYahooMetric(id)
+          ? mockYahooSnapshots[id as YahooMetricId]
+          : isEcosMetric(id)
+          ? mockEcosSnapshots[id as EcosMetricId]
+          : mockSnapshots[id as FredMetricId]
         setSnapshot(mockData)
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
@@ -93,8 +113,9 @@ export function useMetricSnapshot(
 export function useMetricTimeSeries(
   id: FredMetricId | EcosMetricId | any,
   period: string = '3M'
-): { timeSeries: TimeSeriesPoint[]; isLoading: boolean; error: string | null } {
+): { timeSeries: TimeSeriesPoint[]; timezone?: string; isLoading: boolean; error: string | null } {
   const [timeSeries, setTimeSeries] = useState<TimeSeriesPoint[]>([])
+  const [timezone, setTimezone] = useState<string | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -106,11 +127,11 @@ export function useMetricTimeSeries(
       setError(null)
 
       try {
-        const apiEndpoint = isEcosMetric(id) ? 'ecos' : 'fred'
+        const apiEndpoint = isYahooMetric(id) ? 'yahoo' : isEcosMetric(id) ? 'ecos' : 'fred'
         const res = await fetch(`/api/${apiEndpoint}?metricId=${id}&period=${period}`)
         if (!res.ok) throw new Error(`API error: ${res.status}`)
 
-        const data: FredApiResponse | EcosApiResponse = await res.json()
+        const data: FredApiResponse | EcosApiResponse | YahooApiResponse = await res.json()
 
         if (!mounted) return
 
@@ -119,6 +140,11 @@ export function useMetricTimeSeries(
         }
 
         setTimeSeries(data.timeSeries)
+
+        // Yahoo API 응답인 경우 timezone 정보 저장
+        if ('timezone' in data) {
+          setTimezone((data as YahooApiResponse).timezone)
+        }
       } catch (err) {
         console.warn(`[useMetricTimeSeries] Failed to fetch ${id}:`, err)
 
@@ -140,13 +166,31 @@ export function useMetricTimeSeries(
     }
   }, [id, period])
 
-  return { timeSeries, isLoading, error }
+  return { timeSeries, timezone, isLoading, error }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useMetricCurrentValue(metricId: any) {
+  const [timezone, setTimezone] = useState<string | undefined>(undefined)
   const { snapshot } = useMetricSnapshot(metricId as FredMetricId, '3M')
-  return snapshot ? { value: snapshot.value, change: snapshot.change, updatedAt: snapshot.updatedAt } : null
+
+  // Yahoo 지표인 경우 timezone 정보 가져오기
+  useEffect(() => {
+    if (!isYahooMetric(metricId)) return
+
+    fetch(`/api/yahoo?metricId=${metricId}&period=1D`)
+      .then(res => res.json())
+      .then((data: YahooApiResponse) => {
+        if (data.timezone) {
+          setTimezone(data.timezone)
+        }
+      })
+      .catch(() => {
+        // 에러 무시
+      })
+  }, [metricId])
+
+  return snapshot ? { value: snapshot.value, change: snapshot.change, updatedAt: snapshot.updatedAt, timezone } : null
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,12 +208,12 @@ export function useMetricsCurrentValues(metricIds: any[]) {
       await Promise.all(
         metricIds.map(async (id) => {
           try {
-            const apiEndpoint = isEcosMetric(id) ? 'ecos' : 'fred'
+            const apiEndpoint = isYahooMetric(id) ? 'yahoo' : isEcosMetric(id) ? 'ecos' : 'fred'
             const res = await fetch(`/api/${apiEndpoint}?metricId=${id}&period=3M`)
 
             if (!res.ok) throw new Error(`API error: ${res.status}`)
 
-            const data: FredApiResponse | EcosApiResponse = await res.json()
+            const data: FredApiResponse | EcosApiResponse | YahooApiResponse = await res.json()
 
             if (data.timeSeries.length > 0) {
               const snap = buildSnapshot(id, data.timeSeries)
@@ -179,7 +223,9 @@ export function useMetricsCurrentValues(metricIds: any[]) {
             console.warn(`[useMetricsCurrentValues] Failed to fetch ${id}, using mockData:`, err)
 
             // Fallback to mock data
-            const mockData = isEcosMetric(id)
+            const mockData = isYahooMetric(id)
+              ? mockYahooSnapshots[id as YahooMetricId]
+              : isEcosMetric(id)
               ? mockEcosSnapshots[id as EcosMetricId]
               : mockSnapshots[id as FredMetricId]
 

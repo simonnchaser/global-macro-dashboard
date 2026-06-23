@@ -18,7 +18,15 @@ export const ECOS_SERIES: Partial<Record<EcosMetricId, EcosSeriesConfig>> = {
   krCorpAA:       { statCode: '817Y002', itemCode: '010300000', cycle: 'D', needsYoY: false },
   krCorpBBB:      { statCode: '817Y002', itemCode: '010320000', cycle: 'D', needsYoY: false },
   krFxReserves:   { statCode: '902Y014', itemCode: 'KR',        cycle: 'M', needsYoY: false },
+  gdpKr:          { statCode: '902Y015', itemCode: 'KOR',       cycle: 'Q', needsYoY: false },
+  ppiKr:          { statCode: '404Y014', itemCode: '*AA',       cycle: 'M', needsYoY: true  },
+  industrialKr:   { statCode: '902Y020', itemCode: 'KOR',       cycle: 'M', needsYoY: false },
+  // 환율
+  usdKrw:         { statCode: '731Y001', itemCode: '0000001',   cycle: 'D', needsYoY: false },
+  eurKrw:         { statCode: '731Y001', itemCode: '0000003',   cycle: 'D', needsYoY: false },
+  jpyKrw:         { statCode: '731Y001', itemCode: '0000002',   cycle: 'D', needsYoY: false },
+  cnyKrw:         { statCode: '731Y001', itemCode: '0000053',   cycle: 'D', needsYoY: false },
 }
 
 // 계산 지표 목록
-export const ECOS_CALCULATED = new Set<EcosMetricId>(['krIgSpread', 'krHySpread'])
+export const ECOS_CALCULATED = new Set<EcosMetricId>(['krSpread3y10y', 'krIgSpread', 'krHySpread'])

@@ -65,7 +65,7 @@ export default function Home() {
       <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* 탭 콘텐츠 */}
-      <main className="mt-30">
+      <main className="pt-[110px]">
         {renderTabContent()}
       </main>
 

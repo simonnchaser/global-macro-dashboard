@@ -28,7 +28,7 @@ function CompareChartItem({
 
   const meta = getMetricMeta(metricId);
   const currentData = useMetricCurrentValue(metricId);
-  const timeSeriesData = useMetricTimeSeries(metricId);
+  const { timeSeries: timeSeriesData } = useMetricTimeSeries(metricId);
 
   useEffect(() => {
     if (!chartContainerRef.current || !meta) return;

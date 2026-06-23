@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       metricId,
       timeSeries,
       latestValue: latest?.value ?? 0,
-      latestDate:  latest?.time  ?? '',
+      latestDate:  (latest?.time as string) ?? '',
     }
 
     return NextResponse.json(response)

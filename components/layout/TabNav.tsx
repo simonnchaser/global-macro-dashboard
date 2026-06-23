@@ -24,8 +24,8 @@ const tabs: { id: TabId; label: string }[] = [
 
 export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
-    <div className="sticky top-[60px] z-40 bg-[#1e2530] border-b border-[#2d3748]">
-      <div className="px-6 flex items-center gap-1">
+    <div className="fixed top-[60px] left-0 right-0 z-40 bg-[#1e2530] border-b border-[#2d3748] h-[50px]">
+      <div className="px-6 flex items-center gap-1 h-full">
         {tabs.map((tab) => (
           <button
             key={tab.id}

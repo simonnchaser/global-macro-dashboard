@@ -10,11 +10,12 @@ export type MetricId =
   | 'foreignNetBuy' | 'foreignOwnership' | 'fearGreed' | 'cpRatio'
   // 금리·채권
   | 'fedRate' | 'us2y' | 'us10y' | 'spread2y10y'
-  | 'bokRate' | 'kr3y' | 'kr10y' | 'jp10y'
+  | 'bokRate' | 'kr3y' | 'kr10y' | 'krSpread3y10y' | 'jp10y'
   // 환율
-  | 'usdKrw' | 'dxy' | 'usdJpy' | 'eurUsd'
-  // 원자재
-  | 'wti' | 'gold' | 'silver'
+  | 'usdKrw' | 'eurKrw' | 'jpyKrw' | 'cnyKrw'  // ECOS 원화 기준
+  | 'dxy' | 'eurUsd' | 'usdJpy' | 'usdCny'    // FRED 국제 환율
+  // 원자재 (FRED)
+  | 'gold' | 'silver' | 'wti' | 'brent' | 'natgas' | 'copper' | 'gasPrice'
   // 유동성
   | 'fedAssets' | 'tga' | 'rrp' | 'netLiquidity'
   // 크레딧
@@ -22,7 +23,8 @@ export type MetricId =
   | 'krIgSpread' | 'krHySpread' | 'krCorpAA' | 'krCorpBBB' | 'krFxReserves'
   // 경제지표
   | 'cpiUs' | 'pceUs' | 'corePce' | 'trimmedPce' | 'ppiUs'
-  | 'unemployment' | 'pmi' | 'gdpUs' | 'cpiKr' | 'unemploymentKr';
+  | 'unemployment' | 'pmi' | 'gdpUs'
+  | 'cpiKr' | 'unemploymentKr' | 'gdpKr' | 'ppiKr' | 'industrialKr';
 
 export interface MetricValue {
   value: number;

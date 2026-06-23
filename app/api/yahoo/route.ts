@@ -1,62 +1,159 @@
-/**
- * Yahoo Finance API Proxy
- *
- * CORS 우회를 위한 Next.js API Route
- * 클라이언트에서 직접 Yahoo Finance를 호출하면 CORS 에러 발생
- */
+import { NextRequest, NextResponse } from 'next/server'
+import { YAHOO_SYMBOLS, periodToYahooRange } from '@/lib/api/yahoo'
+import { yahooTimestampToDate } from '@/lib/utils/dateUtils'
+import type { YahooMetricId, TimeSeriesPoint, YahooApiResponse } from '@/lib/types/metrics'
 
-import { NextRequest, NextResponse } from 'next/server';
+const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const symbol = searchParams.get('symbol');
-  const range = searchParams.get('range') || '3mo';
+  const { searchParams } = new URL(request.url)
+  const metricId = searchParams.get('metricId') as YahooMetricId
+  const period   = searchParams.get('period') || '3M'
 
-  // range에 따라 최적의 interval 자동 설정
-  let interval = searchParams.get('interval');
-  if (!interval) {
-    if (range === '1mo') interval = '1d';
-    else if (range === '3mo') interval = '1d';
-    else if (range === '6mo') interval = '1d';
-    else if (range === '1y') interval = '1d';
-    else if (range === '2y') interval = '1d';
-    else if (range === '3y') interval = '1d';
-    else if (range === '5y') interval = '1wk';
-    else if (range === '10y') interval = '1wk';
-    else if (range === 'max') interval = '1wk';
-    else interval = '1d';
-  }
-
+  const symbol = YAHOO_SYMBOLS[metricId]
   if (!symbol) {
-    return NextResponse.json(
-      { error: 'Symbol parameter is required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: `Unknown metricId: ${metricId}` }, { status: 400 })
   }
+
+  // 시장별 타임존 오프셋 및 라벨 결정
+  const getTimezoneInfo = (symbol: string): { offset: number; label: string } => {
+    // 한국 증시: UTC → KST (+9시간)
+    if (symbol === '^KS11' || symbol === '^KQ11') {
+      return { offset: 9 * 3600, label: 'KST' }
+    }
+    // 미국 증시: UTC → EDT (-4시간, 일광절약시간 기준)
+    if (symbol === '^GSPC' || symbol === '^IXIC') {
+      return { offset: -4 * 3600, label: 'EDT' }
+    }
+    // 원자재 및 FX: UTC 그대로 (국제 시장)
+    // DX-Y.NYB, EURUSD=X, JPY=X, CNY=X, GC=F, SI=F, CL=F, BZ=F, NG=F, HG=F
+    return { offset: 0, label: 'UTC' }
+  }
+
+  const { offset: timezoneOffset, label: timezoneLabel } = getTimezoneInfo(symbol)
+
+  // 1D일 때: 오늘 1분봉 + 과거 일봉 혼합
+  const is1D = period === '1D'
+  const range = periodToYahooRange(period)
 
   try {
-    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
-      symbol
-    )}?range=${range}&interval=${interval}`;
+    let finalSeries: TimeSeriesPoint[] = []
+    let previousClose = 0
+    let regularMarketPrice = 0
+    let regularMarketTime = null
+    let isMarketOpen = false
 
-    const response = await fetch(yahooUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      },
-    });
+    if (is1D) {
+      // 1D: 오늘 1분봉만 표시 (과거 일봉은 제외)
 
-    if (!response.ok) {
-      throw new Error(`Yahoo Finance API returned ${response.status}`);
+      // 1분봉 데이터 가져오기
+      const intradayUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`
+      const intradayRes = await fetch(intradayUrl, {
+        headers: { 'User-Agent': USER_AGENT },
+        next: { revalidate: 60 },  // 1분마다 갱신
+      })
+
+      if (intradayRes.ok) {
+        const intradayData = await intradayRes.json()
+        const intradayResult = intradayData.chart?.result?.[0]
+
+        if (intradayResult) {
+          const intradayTimestamps: number[] = intradayResult.timestamp ?? []
+          const intradayCloses: (number|null)[] = intradayResult.indicators?.quote?.[0]?.close ?? []
+
+          // 디버깅: 1분봉 데이터 범위 확인
+          console.log(`[${metricId}] 1D mode - Intraday data count: ${intradayTimestamps.length}`)
+          if (intradayTimestamps.length > 0) {
+            const firstDate = new Date((intradayTimestamps[0] + timezoneOffset) * 1000).toISOString()
+            const lastDate = new Date((intradayTimestamps[intradayTimestamps.length - 1] + timezoneOffset) * 1000).toISOString()
+            console.log(`[${metricId}] 1D mode - Intraday range: ${firstDate} to ${lastDate}`)
+          }
+
+          // 1분봉 데이터를 Unix timestamp로 변환 (시장별 타임존 적용)
+          const intradaySeries = intradayTimestamps
+            .map((ts, i) => ({
+              time: ts + timezoneOffset,
+              value: intradayCloses[i],
+            }))
+            .filter((p): p is { time: number; value: number } =>
+              p.value !== null && !isNaN(p.value)
+            )
+
+          // 1D 모드: 1분봉만 사용
+          finalSeries = intradaySeries
+
+          previousClose = intradayResult.meta?.chartPreviousClose ?? 0
+          regularMarketPrice = intradayResult.meta?.regularMarketPrice ?? previousClose
+          regularMarketTime = intradayResult.meta?.regularMarketTime ?? null
+          isMarketOpen = intradaySeries.length > 0
+        }
+      }
+    } else {
+      // 다른 기간: 기존처럼 일봉만 가져오기
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=${range}`
+      const res = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT },
+        next: { revalidate: 300 }, // 5분마다 갱신 (기존 1시간 → 5분)
+      })
+      if (!res.ok) throw new Error(`Yahoo ${res.status}`)
+
+      const data = await res.json()
+      const result = data.chart?.result?.[0]
+      if (!result) throw new Error('No result from Yahoo')
+
+      const timestamps: number[] = result.timestamp ?? []
+      const closes: (number|null)[] = result.indicators?.quote?.[0]?.close ?? []
+
+      // 날짜로 변환
+      const timeSeries: TimeSeriesPoint[] = timestamps
+        .map((ts, i) => ({
+          time: yahooTimestampToDate(ts, false),
+          value: closes[i],
+        }))
+        .filter((p): p is TimeSeriesPoint => p.value !== null && !isNaN(p.value))
+
+      // 중복 날짜 제거
+      const deduped = new Map<string | number, number>()
+      timeSeries.forEach(p => {
+        const key = typeof p.time === 'string' ? p.time : p.time.toString()
+        deduped.set(key, p.value)
+      })
+      finalSeries = Array.from(deduped.entries())
+        .map(([time, value]) => ({ time, value }))
+        .sort((a, b) => {
+          const aTime = typeof a.time === 'string' ? a.time : a.time.toString()
+          const bTime = typeof b.time === 'string' ? b.time : b.time.toString()
+          return aTime.localeCompare(bTime)
+        })
+
+      previousClose = result.meta?.chartPreviousClose ?? finalSeries[finalSeries.length - 1]?.value ?? 0
+      regularMarketPrice = result.meta?.regularMarketPrice ?? previousClose
+      regularMarketTime = result.meta?.regularMarketTime ?? null
     }
 
-    const data = await response.json();
+    const latestValue = finalSeries[finalSeries.length - 1]?.value ?? previousClose
+    const latestTime = finalSeries[finalSeries.length - 1]?.time
+    const latestDate = typeof latestTime === 'string' ? latestTime : ''
 
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('[Yahoo API Route] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch from Yahoo Finance' },
-      { status: 500 }
-    );
+    const response: YahooApiResponse = {
+      metricId,
+      timeSeries: finalSeries,
+      latestValue,
+      latestDate,
+      previousClose,
+      timezone: timezoneLabel,  // 타임존 정보 추가
+      // 실시간 데이터 추가
+      realtime: {
+        price: regularMarketPrice,
+        time: regularMarketTime,
+        isMarketOpen,
+      }
+    }
+
+    return NextResponse.json(response)
+
+  } catch (err) {
+    console.error(`Yahoo fetch error [${metricId}]:`, err)
+    return NextResponse.json({ error: 'Yahoo fetch failed' }, { status: 500 })
   }
 }

@@ -83,6 +83,7 @@ export default function MetricCard({ metricId, onClick }: MetricCardProps) {
       {showDate && data.updatedAt && (
         <div className="text-[10px] text-slate-500 mt-2">
           {formatDate(data.updatedAt)} 기준
+          {data.timezone && ` (${data.timezone})`}
         </div>
       )}
     </div>

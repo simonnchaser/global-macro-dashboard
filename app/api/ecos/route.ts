@@ -13,7 +13,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'ECOS_API_KEY not set' }, { status: 500 })
   }
 
-  // Handle calculated metrics: krIgSpread, krHySpread
+  // Handle calculated metrics: krSpread3y10y, krIgSpread, krHySpread
+  if (metricId === 'krSpread3y10y') {
+    return handleKrSpread3y10y(period, apiKey)
+  }
   if (metricId === 'krIgSpread' || metricId === 'krHySpread') {
     return handleKrSpread(metricId, period, apiKey)
   }
@@ -112,6 +115,43 @@ async function fetchEcosSeries(
   }
 
   return timeSeries
+}
+
+// krSpread3y10y 처리 (kr10y - kr3y)
+async function handleKrSpread3y10y(period: string, apiKey: string) {
+  try {
+    // kr3y + kr10y 병렬 fetch
+    const [kr3yData, kr10yData] = await Promise.all([
+      fetchEcosSeries('kr3y', period, apiKey),
+      fetchEcosSeries('kr10y', period, apiKey),
+    ])
+
+    // 날짜 매칭 후 계산
+    const kr3yMap = new Map(kr3yData.map(p => [p.time, p.value]))
+
+    const timeSeries = kr10yData
+      .filter(p => kr3yMap.has(p.time))
+      .map(p => ({
+        time: p.time,
+        value: Math.round((p.value - kr3yMap.get(p.time)!) * 100 * 10) / 10
+        // (10Y - 3Y) × 100 = bp, 소수점 1자리
+      }))
+
+    const latest = timeSeries[timeSeries.length - 1]
+
+    const response: EcosApiResponse = {
+      metricId: 'krSpread3y10y',
+      timeSeries,
+      latestValue: latest?.value ?? 0,
+      latestDate: latest?.time ?? '',
+    }
+
+    return NextResponse.json(response)
+
+  } catch (err) {
+    console.error('ECOS krSpread3y10y calculation error:', err)
+    return NextResponse.json({ error: 'Spread calculation failed' }, { status: 500 })
+  }
 }
 
 // krIgSpread, krHySpread 처리
