@@ -10,6 +10,7 @@ import type { MetricId } from '@/lib/metrics/metricsTypes';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
 import { useMetricCurrentValue, useMetricTimeSeries } from '@/lib/hooks/useMetrics';
 import { useUserSettings } from '@/lib/store/userSettingsStore';
+import { getChangeColor } from '@/lib/utils/colorUtils';
 import AlarmModal from './AlarmModal';
 
 interface ChartModalProps {
@@ -222,7 +223,7 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
                 <>
                   현재값: <span className="font-mono text-slate-200">{currentData.value.toLocaleString()}{meta.unit}</span>
                   {currentData.change !== null && (
-                    <span className={`ml-2 font-mono ${currentData.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`ml-2 font-mono ${getChangeColor(currentData.change)}`}>
                       {currentData.change > 0 ? '+' : ''}{currentData.change.toFixed(2)}
                     </span>
                   )}

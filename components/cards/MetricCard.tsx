@@ -7,6 +7,7 @@
 import type { MetricId } from '@/lib/metrics/metricsTypes';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
 import { useMetricCurrentValue } from '@/lib/hooks/useMetrics';
+import { getChangeColor, getValueColor } from '@/lib/utils/colorUtils';
 
 interface MetricCardProps {
   metricId: MetricId;
@@ -28,18 +29,9 @@ export default function MetricCard({ metricId, onClick }: MetricCardProps) {
 
   if (!meta || !data) return null;
 
-  // 단순 색상 로직: change 값 기준
-  const valueColor = data.change > 0
-    ? 'text-green-400'
-    : data.change < 0
-    ? 'text-red-400'
-    : 'text-slate-200';
-
-  const changeColor = data.change > 0
-    ? 'text-green-400'
-    : data.change < 0
-    ? 'text-red-400'
-    : 'text-slate-400';
+  // 색상 로직: colorUtils 사용
+  const valueColor = getValueColor(data.change);
+  const changeColor = getChangeColor(data.change);
 
   // 2Y-10Y Spread 음수일 때 보더 주황색
   const borderColor = metricId === 'spread2y10y' && data.value < 0
