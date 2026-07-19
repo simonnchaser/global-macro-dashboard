@@ -12,7 +12,7 @@ interface StocksTabProps {
 }
 
 export default function StocksTab({ onMetricClick }: StocksTabProps) {
-  const stockMetrics = ['sp500', 'nasdaq', 'kospi', 'kosdaq'] as const;
+  const stockMetrics = ['sp500', 'nasdaq', 'kospi', 'kosdaq', 'sse'] as const;
 
   return (
     <div className="pt-4 px-6 pb-8">

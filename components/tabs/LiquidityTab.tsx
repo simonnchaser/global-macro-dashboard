@@ -57,13 +57,6 @@ export default function LiquidityTab({ onMetricClick }: LiquidityTabProps) {
             />
           ))}
         </div>
-
-        {/* Risk On/Off 판단 패널 */}
-        <div className="mt-6 bg-green-950 border-l-4 border-green-500 text-green-200 p-5 rounded">
-          <div className="text-sm mb-2">HY OAS 420bp + VIX (낮음) 기준:</div>
-          <div className="text-lg font-semibold mb-2">🟢 Risk ON — 위험 선호 국면</div>
-          <div className="text-sm">주식 우호 / 신흥국 자금 유입 가능</div>
-        </div>
       </div>
 
       {/* 한국 섹션 */}

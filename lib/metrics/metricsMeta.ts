@@ -459,6 +459,7 @@ export const metricsMeta: MetricMeta[] = [
     unit: '지수',
     tab: 'fx',
     positiveIsGood: true,
+    decimals: 3,  // DXY는 소수점 3자리까지
     description: '달러 강도 지수. EUR(57%), JPY(14%), GBP(12%) 등 6개 통화 대비.',
     interpretation:
       '글로벌 달러 강도의 기준. DXY↑ = 달러 강세 = 신흥국 통화 약세. ' +
@@ -480,6 +481,7 @@ export const metricsMeta: MetricMeta[] = [
     unit: 'USD',
     tab: 'fx',
     positiveIsGood: true,
+    decimals: 4,  // 환율은 소수점 4자리까지
     description: 'DXY의 57%를 차지하는 가장 영향력 있는 환율.',
     interpretation:
       'EUR/USD↑ = 유로 강세 = DXY↓. ' +
@@ -501,6 +503,7 @@ export const metricsMeta: MetricMeta[] = [
     unit: 'JPY',
     tab: 'fx',
     positiveIsGood: true,
+    decimals: 3,  // 엔화는 소수점 3자리까지
     description: '달러당 엔화. 엔캐리 트레이드의 핵심 지표.',
     interpretation:
       'USD/JPY↑ = 엔 약세 → 엔캐리 활성화 → 글로벌 위험자산 우호적. ' +
@@ -522,6 +525,7 @@ export const metricsMeta: MetricMeta[] = [
     unit: 'CNY',
     tab: 'fx',
     positiveIsGood: false,
+    decimals: 4,  // 위안화는 소수점 4자리까지
     description: '달러당 위안. 중국 경기와 PBOC 정책 반영.',
     interpretation:
       'USD/CNY↑ = 위안 약세 → 중국 경기 우려 또는 자본 유출. ' +
@@ -576,6 +580,54 @@ export const metricsMeta: MetricMeta[] = [
     ],
     chartConfig: {
       color: '#3b82f6',
+    },
+  },
+
+  {
+    id: 'kosdaq',
+    label: 'KOSDAQ (KR)',
+    labelKo: 'KOSDAQ (한국)',
+    unit: 'pt',
+    tab: 'stocks',
+    positiveIsGood: true,
+    description: '한국 중소형·기술주 중심 시장. 변동성이 높고 국내 유동성에 민감.',
+    interpretation:
+      '코스닥은 IT, 바이오, 2차전지 등 성장주 비중이 높아 KOSPI보다 변동성이 크다. ' +
+      '외국인 비중은 낮지만 개인 투자자 비중이 높아 국내 유동성과 심리에 직접 반응한다. ' +
+      'KOSPI가 수출 대기업 중심이라면, KOSDAQ은 국내 성장주 중심.',
+    relationships: [
+      '국내 유동성↑ → KOSDAQ↑ (개인 투자 활성화)',
+      'NASDAQ↑ → KOSDAQ↑ (기술주 동행)',
+      '금리↑ → KOSDAQ↓ (성장주 밸류에이션 압박)',
+      'KOSDAQ/KOSPI 비율↑ → 위험선호 심리 강화',
+    ],
+    chartConfig: {
+      color: '#22c55e',
+    },
+  },
+
+  {
+    id: 'sse',
+    label: 'SSE Composite (CN)',
+    labelKo: '상해종합지수 (중국)',
+    unit: 'pt',
+    tab: 'stocks',
+    positiveIsGood: true,
+    description: '중국 본토 증시의 대표 지수. 상해거래소 A주 + B주 전체.',
+    interpretation:
+      '중국 정부의 정책과 부동산 시장, 인프라 투자에 극단적으로 민감하다. ' +
+      '외국인 투자 제한(QFII)으로 홍콩 H주(항셍지수)와 괴리가 크다. ' +
+      '중국 경기 선행지표로, 구리 가격 및 한국 수출과 높은 상관관계. ' +
+      'PBOC(중국인민은행) 정책 완화 시 급등, 긴축 시 급락하는 정책 민감 시장.',
+    relationships: [
+      'PBOC 완화(RRR 인하, 유동성 공급) → SSE↑',
+      '부동산 규제 완화 → SSE↑ (부동산주 비중 높음)',
+      'SSE↑ → 구리↑ (중국 인프라 투자 기대)',
+      'SSE↑ → KOSPI↑ (한국 수출 증가 기대)',
+      'USD/CNY↑ (위안 약세) → SSE↓ (자본 유출)',
+    ],
+    chartConfig: {
+      color: '#ef4444',
     },
   },
 
@@ -692,6 +744,7 @@ export const metricsMeta: MetricMeta[] = [
     unit: '%',
     tab: 'economic',
     positiveIsGood: true,
+    frequency: 'quarterly',
     description: '미국 실질 GDP 전년 대비 성장률. 경기 종합 지표.',
     interpretation: 'GDP 고성장 + 고인플레 → 긴축. GDP 저성장 + 저인플레 → 완화.',
     relationships: ['GDP↑ + CPI↑ → 긴축 국면'],
@@ -845,6 +898,7 @@ export const metricsMeta: MetricMeta[] = [
     unit: '% QoQ',
     tab: 'economic',
     positiveIsGood: true,
+    frequency: 'quarterly',
     description: '한국 실질 GDP 성장률 (전분기 대비). 분기별 발표.',
     interpretation: '2% 이상 양호, 0~1% 성장 둔화, 음수 기술적 침체. 수출 의존 경제로 글로벌 경기에 민감.',
     relationships: ['GDP↑ → BOK 인상 압력', '수출↓ → GDP↓', '중국 경기↓ → 한국 GDP↓'],

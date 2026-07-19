@@ -17,19 +17,25 @@ export type FredMetricId =
   | 'spread2y10y'
   | 'netLiquidity'
 
-// Yahoo Finance 지표 ID (증시, 국제환율, 원자재)
+// Yahoo Finance 지표 ID (증시, 환율, 원자재)
 export type YahooMetricId =
   // 증시
   | 'sp500'
   | 'nasdaq'
   | 'kospi'
   | 'kosdaq'
-  // 국제 환율 (FRED에서 Yahoo로 이전)
+  | 'sse'          // 상해종합지수 (Shanghai Composite)
+  // 국제 환율
   | 'dxy'           // 달러인덱스
   | 'eurUsd'        // EUR/USD
   | 'usdJpy'        // USD/JPY
   | 'usdCny'        // USD/CNY
-  // 원자재 (FRED에서 Yahoo로 이전)
+  // 원화 환율 (ECOS에서 Yahoo로 이전)
+  | 'usdKrw'        // USD/KRW
+  | 'eurKrw'        // EUR/KRW
+  | 'jpyKrw'        // JPY/KRW (100엔)
+  | 'cnyKrw'        // CNY/KRW
+  // 원자재
   | 'gold'          // 금
   | 'silver'        // 은
   | 'wti'           // WTI 원유
@@ -71,11 +77,7 @@ export type EcosMetricId =
   | 'gdpKr'         // 한국 GDP 성장률 (분기)
   | 'ppiKr'         // 한국 생산자물가지수 (월)
   | 'industrialKr'  // 한국 산업생산지수 (월)
-  // 환율 (ECOS)
-  | 'usdKrw'        // 달러/원 (매매기준율)
-  | 'eurKrw'        // 유로/원
-  | 'jpyKrw'        // 엔/원 (100엔)
-  | 'cnyKrw'        // 위안/원 (매매기준율)
+  // 원화 환율은 Yahoo로 이전 (usdKrw, eurKrw, jpyKrw, cnyKrw 제거)
   // 계산 지표
   | 'krSpread3y10y' // (kr10y - kr3y) × 100 (bp)
   | 'krIgSpread'    // (krCorpAA - kr3y) × 100 (bp)

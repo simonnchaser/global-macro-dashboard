@@ -46,9 +46,16 @@ export default function TopBar() {
         >
           {pinnedMetrics.map((metricId) => {
             const meta = getMetricMeta(metricId);
-            const data = metricsData[metricId];
+            const rawData = metricsData[metricId];
 
-            if (!meta || !data) return null;
+            if (!meta || !rawData) return null;
+
+            // 이미 성장률/비율로 표시되는 지표는 변화율(%) 제거
+            const isPercentageMetric = meta.unit === '%' || meta.unit === '% QoQ' || meta.unit === '% YoY';
+            const data = {
+              ...rawData,
+              changePercent: isPercentageMetric ? undefined : rawData.changePercent,
+            };
 
             // 단순 색상 로직: change 값 기준 (MetricCard와 동일)
             const valueColor = data.change > 0
@@ -64,14 +71,16 @@ export default function TopBar() {
               : 'text-slate-400';
 
             return (
-              <div key={metricId} className="flex items-center gap-3 flex-shrink-0 group relative">
+              <div key={metricId} className="flex items-center gap-3 flex-shrink-0 group relative pl-6">
                 {/* 제거 버튼 (hover시 표시) */}
                 <button
                   onClick={() => removePinnedMetric(metricId)}
-                  className="absolute -left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-red-500/90 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg hover:scale-110"
                   title="핀 제거"
                 >
-                  ×
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
 
                 <div className="text-xs text-slate-400 uppercase tracking-wider whitespace-nowrap">
@@ -82,8 +91,19 @@ export default function TopBar() {
                     {data.value.toLocaleString()}{meta.unit}
                   </div>
                   {data.change !== null && (
-                    <div className={`text-xs font-mono ${changeColor} whitespace-nowrap`}>
-                      {data.change > 0 ? '+' : ''}{data.change.toFixed(2)}
+                    <div className={`text-xs font-mono ${changeColor} whitespace-nowrap flex items-center gap-1`}>
+                      <span>{data.change > 0 ? '+' : ''}{data.change.toFixed(meta.decimals ?? 2)}</span>
+                      {data.changePercent !== undefined && (
+                        <span className={`px-2 py-0.5 rounded font-semibold ${
+                          data.changePercent > 0
+                            ? 'bg-green-500/30 text-green-300'
+                            : data.changePercent < 0
+                              ? 'bg-red-500/30 text-red-300'
+                              : 'bg-slate-500/30 text-slate-300'
+                        }`}>
+                          {data.changePercent > 0 ? '+' : ''}{data.changePercent.toFixed(2)}%
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>

@@ -11,7 +11,7 @@ function isEcosMetric(id: string): id is EcosMetricId {
     'bokRate', 'kr3y', 'kr10y', 'cpiKr', 'unemploymentKr',
     'krCorpAA', 'krCorpBBB', 'krFxReserves',
     'gdpKr', 'ppiKr', 'industrialKr',
-    'usdKrw', 'eurKrw', 'jpyKrw', 'cnyKrw',
+    // 원화 환율은 Yahoo로 이전 (usdKrw, eurKrw, jpyKrw, cnyKrw 제거)
     'krSpread3y10y', 'krIgSpread', 'krHySpread'
   ]
   return ecosMetrics.includes(id as EcosMetricId)
@@ -21,9 +21,11 @@ function isEcosMetric(id: string): id is EcosMetricId {
 function isYahooMetric(id: string): id is YahooMetricId {
   const yahooMetrics: YahooMetricId[] = [
     // 증시
-    'sp500', 'nasdaq', 'kospi', 'kosdaq',
+    'sp500', 'nasdaq', 'kospi', 'kosdaq', 'sse',
     // 국제 환율
     'dxy', 'eurUsd', 'usdJpy', 'usdCny',
+    // 원화 환율 (ECOS에서 이전)
+    'usdKrw', 'eurKrw', 'jpyKrw', 'cnyKrw',
     // 원자재
     'gold', 'silver', 'wti', 'brent', 'natgas', 'copper'
   ]
@@ -172,9 +174,15 @@ export function useMetricTimeSeries(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useMetricCurrentValue(metricId: any) {
   const [timezone, setTimezone] = useState<string | undefined>(undefined)
-  const { snapshot } = useMetricSnapshot(metricId as FredMetricId, '3M')
+  const [yahooData, setYahooData] = useState<{ value: number; change: number; changePercent: number; updatedAt: string } | null>(null)
 
-  // Yahoo 지표인 경우 timezone 정보 가져오기
+  // 분기별/연간 데이터는 더 긴 기간 사용
+  const quarterlyMetrics = ['gdpUs', 'gdpKr'];
+  const period = quarterlyMetrics.includes(metricId) ? '1Y' : '3M';
+
+  const { snapshot } = useMetricSnapshot(metricId as FredMetricId, period)
+
+  // Yahoo 지표인 경우 실시간 데이터 가져오기
   useEffect(() => {
     if (!isYahooMetric(metricId)) return
 
@@ -184,13 +192,30 @@ export function useMetricCurrentValue(metricId: any) {
         if (data.timezone) {
           setTimezone(data.timezone)
         }
+        // Yahoo는 previousClose 대비 변화량 계산
+        if (data.realtime && data.previousClose) {
+          const currentPrice = data.realtime.price
+          const change = currentPrice - data.previousClose
+          const changePercent = (change / data.previousClose) * 100
+          setYahooData({
+            value: currentPrice,
+            change: Math.round(change * 10000) / 10000,  // 소수점 4자리까지 (환율 대응)
+            changePercent: Math.round(changePercent * 100) / 100,
+            updatedAt: data.realtime.time ? new Date(data.realtime.time * 1000).toISOString() : data.latestDate
+          })
+        }
       })
       .catch(() => {
-        // 에러 무시
+        // 에러 시 기본 snapshot 사용
       })
   }, [metricId])
 
-  return snapshot ? { value: snapshot.value, change: snapshot.change, updatedAt: snapshot.updatedAt, timezone } : null
+  // Yahoo 지표는 실시간 데이터 우선, 아니면 snapshot
+  if (isYahooMetric(metricId) && yahooData) {
+    return { ...yahooData, timezone }
+  }
+
+  return snapshot ? { value: snapshot.value, change: snapshot.change, changePercent: snapshot.changePercent, updatedAt: snapshot.updatedAt, timezone } : null
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -217,7 +242,7 @@ export function useMetricsCurrentValues(metricIds: any[]) {
 
             if (data.timeSeries.length > 0) {
               const snap = buildSnapshot(id, data.timeSeries)
-              result[id] = { value: snap.value, change: snap.change }
+              result[id] = { value: snap.value, change: snap.change, changePercent: snap.changePercent }
             }
           } catch (err) {
             console.warn(`[useMetricsCurrentValues] Failed to fetch ${id}, using mockData:`, err)
@@ -230,7 +255,7 @@ export function useMetricsCurrentValues(metricIds: any[]) {
               : mockSnapshots[id as FredMetricId]
 
             if (mockData) {
-              result[id] = { value: mockData.value, change: mockData.change }
+              result[id] = { value: mockData.value, change: mockData.change, changePercent: mockData.changePercent }
             }
           }
         })

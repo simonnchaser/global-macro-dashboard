@@ -8,6 +8,7 @@ import type { MetricId } from '@/lib/metrics/metricsTypes';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
 import { useMetricCurrentValue } from '@/lib/hooks/useMetrics';
 import { getChangeColor, getValueColor } from '@/lib/utils/colorUtils';
+import { useUserSettings } from '@/lib/store/userSettingsStore';
 
 interface MetricCardProps {
   metricId: MetricId;
@@ -25,16 +26,53 @@ function getCountryFlag(label: string): string {
 
 export default function MetricCard({ metricId, onClick }: MetricCardProps) {
   const meta = getMetricMeta(metricId);
-  const data = useMetricCurrentValue(metricId);
+  const rawData = useMetricCurrentValue(metricId);
+  const { alarms } = useUserSettings();
 
-  if (!meta || !data) return null;
+  if (!meta || !rawData) return null;
+
+  // 이미 성장률/비율로 표시되는 지표는 변화율(%) 제거
+  const isPercentageMetric = meta.unit === '%' || meta.unit === '% QoQ' || meta.unit === '% YoY';
+  const data = {
+    ...rawData,
+    changePercent: isPercentageMetric ? undefined : rawData.changePercent,
+  };
 
   // 색상 로직: colorUtils 사용
   const valueColor = getValueColor(data.change);
   const changeColor = getChangeColor(data.change);
 
-  // 2Y-10Y Spread 음수일 때 보더 주황색
-  const borderColor = metricId === 'spread2y10y' && data.value < 0
+  // 알람 발동 여부 확인
+  const checkAlarmTriggered = () => {
+    const activeAlarms = alarms.filter(a => a.metricId === metricId && a.isActive);
+
+    return activeAlarms.some(alarm => {
+      const { condition } = alarm;
+      const value = data.value;
+
+      switch (condition.type) {
+        case 'above':
+          return value > condition.threshold;
+        case 'below':
+          return value < condition.threshold;
+        case 'crossUp':
+        case 'crossDown':
+          // crossUp/Down은 이전 값과 비교가 필요하므로 여기서는 단순 비교
+          return condition.type === 'crossUp'
+            ? value > condition.threshold
+            : value < condition.threshold;
+        default:
+          return false;
+      }
+    });
+  };
+
+  const isAlarmTriggered = checkAlarmTriggered();
+
+  // 보더 색상: 알람 발동 > 2Y-10Y 음수 > 기본
+  const borderColor = isAlarmTriggered
+    ? 'border-red-500 animate-pulse'
+    : metricId === 'spread2y10y' && data.value < 0
     ? 'border-orange-500'
     : 'border-[#2d3748]';
 
@@ -68,8 +106,19 @@ export default function MetricCard({ metricId, onClick }: MetricCardProps) {
         {data.value.toLocaleString()}{meta.unit}
       </div>
       {data.change !== null && (
-        <div className={`text-xs font-mono ${changeColor}`}>
-          {data.change > 0 ? '+' : ''}{data.change.toFixed(2)}
+        <div className={`text-xs font-mono ${changeColor} flex items-center gap-1`}>
+          <span>{data.change > 0 ? '+' : ''}{data.change.toFixed(meta.decimals ?? 2)}</span>
+          {data.changePercent !== undefined && (
+            <span className={`px-2 py-0.5 rounded font-semibold ${
+              data.changePercent > 0
+                ? 'bg-green-500/30 text-green-300'
+                : data.changePercent < 0
+                  ? 'bg-red-500/30 text-red-300'
+                  : 'bg-slate-500/30 text-slate-300'
+            }`}>
+              {data.changePercent > 0 ? '+' : ''}{data.changePercent.toFixed(2)}%
+            </span>
+          )}
         </div>
       )}
       {showDate && data.updatedAt && (

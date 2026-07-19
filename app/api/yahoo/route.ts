@@ -25,7 +25,15 @@ export async function GET(request: NextRequest) {
     if (symbol === '^GSPC' || symbol === '^IXIC') {
       return { offset: -4 * 3600, label: 'EDT' }
     }
-    // 원자재 및 FX: UTC 그대로 (국제 시장)
+    // 중국 증시: UTC → CST (+8시간)
+    if (symbol === '000001.SS') {
+      return { offset: 8 * 3600, label: 'CST' }
+    }
+    // 원화 환율: UTC → KST (+9시간)
+    if (symbol === 'KRW=X' || symbol === 'EURKRW=X' || symbol === 'JPYKRW=X' || symbol === 'CNYKRW=X') {
+      return { offset: 9 * 3600, label: 'KST' }
+    }
+    // 원자재 및 국제 FX: UTC 그대로 (국제 시장)
     // DX-Y.NYB, EURUSD=X, JPY=X, CNY=X, GC=F, SI=F, CL=F, BZ=F, NG=F, HG=F
     return { offset: 0, label: 'UTC' }
   }

@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, LineSeries, AreaSeries, type UTCTimestamp } from 'lightweight-charts';
 import type { MetricId } from '@/lib/metrics/metricsTypes';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
-import { useMetricCurrentValue, useMetricTimeSeries } from '@/lib/hooks/useMetrics';
+import { useMetricTimeSeries, useMetricCurrentValue } from '@/lib/hooks/useMetrics';
 import { useUserSettings } from '@/lib/store/userSettingsStore';
 import { getChangeColor } from '@/lib/utils/colorUtils';
 import AlarmModal from './AlarmModal';
@@ -20,22 +20,64 @@ interface ChartModalProps {
 
 export default function ChartModal({ metricId, onClose }: ChartModalProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const [period, setPeriod] = useState<'1D' | '1M' | '3M' | '6M' | '1Y' | 'MAX'>('6M');
+  const meta = getMetricMeta(metricId);
+
+  // 지표 주기에 따라 사용 가능한 기간 필터링
+  const yahooMetrics = [
+    'sp500', 'nasdaq', 'kospi', 'kosdaq', 'sse',
+    'dxy', 'eurUsd', 'usdJpy', 'usdCny', 'usdKrw', 'eurKrw', 'jpyKrw', 'cnyKrw',
+    'gold', 'silver', 'wti', 'brent', 'natgas', 'copper'
+  ];
+  const isYahooMetric = yahooMetrics.includes(metricId as string);
+
+  const getAvailablePeriods = (): Array<'1D' | '1M' | '3M' | '6M' | '1Y' | 'MAX'> => {
+    if (!meta) return ['1M', '3M', '6M', '1Y', 'MAX'];
+
+    const allPeriods: Array<'1D' | '1M' | '3M' | '6M' | '1Y' | 'MAX'> = ['1M', '3M', '6M', '1Y', 'MAX'];
+
+    if (isYahooMetric) {
+      allPeriods.unshift('1D');
+    }
+
+    switch (meta.frequency) {
+      case 'quarterly':
+        return allPeriods.filter(p => !['1D', '1M', '3M'].includes(p));
+      case 'yearly':
+        return allPeriods.filter(p => !['1D', '1M', '3M', '6M'].includes(p));
+      case 'monthly':
+        return allPeriods.filter(p => p !== '1D');
+      default:
+        return allPeriods;
+    }
+  };
+
+  const availablePeriods = getAvailablePeriods();
+  const defaultPeriod = availablePeriods.includes('6M') ? '6M' : availablePeriods[0];
+
+  const [period, setPeriod] = useState<'1D' | '1M' | '3M' | '6M' | '1Y' | 'MAX'>(defaultPeriod);
   const [showAlarmModal, setShowAlarmModal] = useState(false);
 
-  const meta = getMetricMeta(metricId);
-  const currentData = useMetricCurrentValue(metricId);
   const { timeSeries: timeSeriesData, timezone } = useMetricTimeSeries(metricId as any, period);
+
+  // 현재값은 항상 최신 실시간 데이터 사용 (기간과 무관)
+  const realtimeData = useMetricCurrentValue(metricId);
+
+  // 현재값 포맷팅 - 이미 성장률/비율로 표시되는 지표는 변화율(%) 제거
+  const currentData = realtimeData ? (() => {
+    // GDP, 금리, 실업률 등 이미 %로 표시되는 지표는 변화율 의미 없음
+    const isPercentageMetric = meta?.unit === '%' || meta?.unit === '% QoQ' || meta?.unit === '% YoY';
+
+    return {
+      ...realtimeData,
+      changePercent: isPercentageMetric ? undefined : realtimeData.changePercent,
+    };
+  })() : null;
 
   const { compareCharts, addCompareChart, addAlarm } = useUserSettings();
 
   // 이미 차트 비교에 추가되어 있는지 확인
   const isInCompare = compareCharts.includes(metricId);
   const canAddToCompare = compareCharts.length < 6; // 최대 6개
-
-  // Yahoo 지표인지 확인
-  const yahooMetrics = ['sp500', 'nasdaq', 'kospi', 'kosdaq', 'dxy', 'eurUsd', 'usdJpy', 'usdCny', 'gold', 'silver', 'wti', 'brent', 'natgas', 'copper'];
-  const isYahooMetric = yahooMetrics.includes(metricId as string);
 
   // 모달이 열렸을 때 배경 스크롤 막기
   useEffect(() => {
@@ -75,6 +117,10 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
     const lineSeries = chart.addSeries(LineSeries, {
       color: meta.chartConfig.color,
       lineWidth: 2,
+      priceFormat: {
+        type: 'price',
+        precision: meta.decimals ?? 2,
+      },
     });
 
     // 데이터 형식 변환: 모두 동일한 타입으로 통일
@@ -215,40 +261,47 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
-        <div className="flex items-center justify-between p-6 border-b border-[#2d3748]">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-200">{meta.label}</h2>
-            <div className="text-sm text-slate-400 mt-1">
-              {currentData ? (
-                <>
-                  현재값: <span className="font-mono text-slate-200">{currentData.value.toLocaleString()}{meta.unit}</span>
-                  {currentData.change !== null && (
-                    <span className={`ml-2 font-mono ${getChangeColor(currentData.change)}`}>
-                      {currentData.change > 0 ? '+' : ''}{currentData.change.toFixed(2)}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span className="text-slate-500">Loading...</span>
-              )}
+        <div className="p-6 border-b border-[#2d3748]">
+          <div className="flex items-start justify-between gap-6 mb-4">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-semibold text-slate-200 mb-2">{meta.label}</h2>
+              <div className="text-sm text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1">
+                {currentData ? (
+                  <>
+                    <span className="whitespace-nowrap">현재값: <span className="font-mono text-slate-200">{currentData.value.toLocaleString()}{meta.unit}</span></span>
+                    {currentData.change !== null && (
+                      <>
+                        <span className={`font-mono whitespace-nowrap ${getChangeColor(currentData.change)}`}>
+                          {currentData.change > 0 ? '+' : ''}{currentData.change.toFixed(meta.decimals ?? 2)}
+                        </span>
+                        {currentData.changePercent !== undefined && (
+                          <span className={`px-2 py-0.5 rounded font-mono font-semibold whitespace-nowrap ${
+                            currentData.changePercent > 0
+                              ? 'bg-green-500/30 text-green-300'
+                              : currentData.changePercent < 0
+                                ? 'bg-red-500/30 text-red-300'
+                                : 'bg-slate-500/30 text-slate-300'
+                          }`}>
+                            {currentData.changePercent > 0 ? '+' : ''}{currentData.changePercent.toFixed(2)}%
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-slate-500">Loading...</span>
+                )}
+              </div>
             </div>
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-200 flex-shrink-0">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <div className="flex items-center gap-3">
-            {/* 기간 선택 */}
-            {/* Yahoo 지표일 때만 1D 탭 표시 */}
-            {isYahooMetric && (
-              <button
-                onClick={() => setPeriod('1D')}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
-                  period === '1D'
-                    ? 'bg-[#3b82f6] text-white'
-                    : 'bg-[#0f1117] text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                1D
-              </button>
-            )}
-            {(['1M', '3M', '6M', '1Y', 'MAX'] as const).map((p) => (
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* 기간 선택 - 지표 주기에 따라 동적으로 표시 */}
+            {availablePeriods.map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
@@ -261,11 +314,6 @@ export default function ChartModal({ metricId, onClose }: ChartModalProps) {
                 {p}
               </button>
             ))}
-            <button onClick={onClose} className="text-slate-400 hover:text-slate-200 ml-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
         </div>
 

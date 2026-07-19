@@ -6,12 +6,18 @@ export const YAHOO_SYMBOLS: Record<YahooMetricId, string> = {
   nasdaq:  '^IXIC',
   kospi:   '^KS11',
   kosdaq:  '^KQ11',
-  // 국제 환율 (FRED에서 이전)
+  sse:     '000001.SS',  // 상해종합지수 (Shanghai Composite)
+  // 국제 환율
   dxy:     'DX-Y.NYB',
   eurUsd:  'EURUSD=X',
   usdJpy:  'JPY=X',
   usdCny:  'CNY=X',
-  // 원자재 (FRED에서 이전)
+  // 원화 환율 (ECOS에서 이전)
+  usdKrw:  'KRW=X',
+  eurKrw:  'EURKRW=X',
+  jpyKrw:  'JPYKRW=X',
+  cnyKrw:  'CNYKRW=X',
+  // 원자재
   gold:    'GC=F',
   silver:  'SI=F',
   wti:     'CL=F',

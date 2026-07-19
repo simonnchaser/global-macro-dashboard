@@ -38,6 +38,8 @@ export interface MetricMeta {
   unit: string;
   tab: TabId;
   positiveIsGood: boolean;  // false = 상승이 나쁜 지표 (USD/KRW, VIX 등)
+  decimals?: number;        // 변화량 표시 소수점 자릿수 (기본값: 2)
+  frequency?: 'daily' | 'monthly' | 'quarterly' | 'yearly';  // 데이터 주기
 
   // 모달에 표시되는 설명
   description: string;      // 이 지표가 무엇인지 (1~2문장)

@@ -16,19 +16,6 @@ export default function EconomicTab({ onMetricClick }: EconomicTabProps) {
 
   return (
     <div className="pt-4 px-6 pb-8">
-      {/* 시장 국면 판단 패널 */}
-      <div className="mb-6 bg-red-950 border-l-4 border-red-500 text-red-200 p-5 rounded-xl">
-        <div className="text-lg font-semibold mb-3">
-          🔴 현재 시장 국면: 과열·긴축 국면
-        </div>
-        <div className="text-sm mb-3">
-          경기↑ 성장 중 | 물가↑ 2% 초과
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">자산 배치 시사점:</span> 주식↓ / 채권가격↓ / 달러↑ / KOSPI↓
-        </div>
-      </div>
-
       {/* 경제지표 카드 그리드 */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {economicMetrics.map((metricId) => (
