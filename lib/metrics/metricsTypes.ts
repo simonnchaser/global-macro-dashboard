@@ -6,7 +6,7 @@ export type TabId = 'stocks' | 'bonds' | 'fx' | 'liquidity' | 'economic' | 'cale
 
 export type MetricId =
   // 증시
-  | 'sp500' | 'nasdaq' | 'kospi' | 'kosdaq'
+  | 'sp500' | 'nasdaq' | 'kospi' | 'kosdaq' | 'sse'
   | 'foreignNetBuy' | 'foreignOwnership' | 'fearGreed' | 'cpRatio'
   // 금리·채권
   | 'fedRate' | 'us2y' | 'us10y' | 'spread2y10y'

@@ -27,11 +27,17 @@ export const mockYahooSnapshots: Record<YahooMetricId, MetricSnapshot> = {
   nasdaq:  { id: 'nasdaq',  value: 16340.8, change: +125.3, changePercent: +0.77, updatedAt: '2026-06-17' },
   kospi:   { id: 'kospi',   value: 2680.5,  change: +18.2,  changePercent: +0.68, updatedAt: '2026-06-17' },
   kosdaq:  { id: 'kosdaq',  value: 840.3,   change: +6.5,   changePercent: +0.78, updatedAt: '2026-06-17' },
+  sse:     { id: 'sse',     value: 2980.4,  change: -12.3,  changePercent: -0.41, updatedAt: '2026-06-17' },
   // 국제 환율
   dxy:     { id: 'dxy',     value: 105.8,   change: +0.6,   changePercent: +0.57, updatedAt: '2026-06-17' },
   eurUsd:  { id: 'eurUsd',  value: 1.0745,  change: -0.0055, changePercent: -0.51, updatedAt: '2026-06-17' },
   usdJpy:  { id: 'usdJpy',  value: 158.2,   change: +0.7,   changePercent: +0.44, updatedAt: '2026-06-17' },
   usdCny:  { id: 'usdCny',  value: 7.28,    change: +0.02,  changePercent: +0.28, updatedAt: '2026-06-17' },
+  // 원화 환율 (ECOS에서 이전)
+  usdKrw:  { id: 'usdKrw',  value: 1466,    change: +15.2,  changePercent: +1.05, updatedAt: '2026-06-11' },
+  eurKrw:  { id: 'eurKrw',  value: 1585,    change: +8.5,   changePercent: +0.54, updatedAt: '2026-06-11' },
+  jpyKrw:  { id: 'jpyKrw',  value: 930,     change: -5.3,   changePercent: -0.57, updatedAt: '2026-06-11' },
+  cnyKrw:  { id: 'cnyKrw',  value: 228,     change: +3.6,   changePercent: +1.60, updatedAt: '2026-06-08' },
   // 원자재
   gold:    { id: 'gold',    value: 2348.5,  change: +8.5,   changePercent: +0.36, updatedAt: '2026-06-17' },
   silver:  { id: 'silver',  value: 29.85,   change: +0.35,  changePercent: +1.19, updatedAt: '2026-06-17' },
@@ -53,11 +59,6 @@ export const mockEcosSnapshots: Record<EcosMetricId, EcosMetricSnapshot> = {
   gdpKr:          { id: 'gdpKr',          value: 1.831, change: +1.94, changePercent: 0,     updatedAt: '2026-01-01' },  // 2026Q1
   ppiKr:          { id: 'ppiKr',          value: 6.9,   change: +2.75, changePercent: 0,     updatedAt: '2026-04-01' },
   industrialKr:   { id: 'industrialKr',   value: 125.1, change: -0.9,  changePercent: -0.71, updatedAt: '2026-04-01' },
-  // 환율 (ECOS)
-  usdKrw:         { id: 'usdKrw',         value: 1466,  change: +15.2, changePercent: +1.05, updatedAt: '2026-06-11' },
-  eurKrw:         { id: 'eurKrw',         value: 1585,  change: +8.5,  changePercent: +0.54, updatedAt: '2026-06-11' },
-  jpyKrw:         { id: 'jpyKrw',         value: 930,   change: -5.3,  changePercent: -0.57, updatedAt: '2026-06-11' },  // 100엔
-  cnyKrw:         { id: 'cnyKrw',         value: 228,   change: +3.6,  changePercent: +1.60, updatedAt: '2026-06-08' },
   // 계산 지표
   krSpread3y10y:  { id: 'krSpread3y10y',  value: 45.1,  change: +0.5,  changePercent: +1.12, updatedAt: '2026-06-10' },
   krIgSpread:     { id: 'krIgSpread',     value: 65,    change: +1,    changePercent: +1.56, updatedAt: '2026-06-10' },

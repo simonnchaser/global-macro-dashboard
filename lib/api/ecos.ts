@@ -21,11 +21,6 @@ export const ECOS_SERIES: Partial<Record<EcosMetricId, EcosSeriesConfig>> = {
   gdpKr:          { statCode: '902Y015', itemCode: 'KOR',       cycle: 'Q', needsYoY: false },
   ppiKr:          { statCode: '404Y014', itemCode: '*AA',       cycle: 'M', needsYoY: true  },
   industrialKr:   { statCode: '902Y020', itemCode: 'KOR',       cycle: 'M', needsYoY: false },
-  // 환율
-  usdKrw:         { statCode: '731Y001', itemCode: '0000001',   cycle: 'D', needsYoY: false },
-  eurKrw:         { statCode: '731Y001', itemCode: '0000003',   cycle: 'D', needsYoY: false },
-  jpyKrw:         { statCode: '731Y001', itemCode: '0000002',   cycle: 'D', needsYoY: false },
-  cnyKrw:         { statCode: '731Y001', itemCode: '0000053',   cycle: 'D', needsYoY: false },
 }
 
 // 계산 지표 목록
