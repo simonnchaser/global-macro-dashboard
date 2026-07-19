@@ -1,0 +1,536 @@
+/**
+ * 정기적인 경제 지표 발표 일정
+ * 우리 대시보드 지표들의 실제 발표 스케줄
+ */
+
+export interface ScheduledEvent {
+  id: string;
+  metricId: string;  // 대시보드 지표 ID
+  title: string;
+  titleKo: string;
+  country: 'US' | 'KR' | 'CN' | 'JP' | 'EU';
+  releaseDate: string;  // YYYY-MM-DD
+  releaseTime?: string;  // HH:MM (local time)
+  timezone?: string;
+  frequency: 'monthly' | 'quarterly' | 'yearly' | 'adhoc';
+  impact: 'high' | 'medium' | 'low';
+  estimate?: number | string;
+  previous?: number | string;
+}
+
+// 2026년 하반기 예정 이벤트
+export const scheduledEvents: ScheduledEvent[] = [
+  // === FOMC 회의 (연 8회, 일정 공지됨) ===
+  {
+    id: 'fomc-2026-07',
+    metricId: 'fedRate',
+    title: 'FOMC Meeting',
+    titleKo: 'FOMC 회의',
+    country: 'US',
+    releaseDate: '2026-07-29',  // Wed
+    releaseTime: '14:00',
+    timezone: 'EDT',
+    frequency: 'adhoc',
+    impact: 'high',
+    previous: '3.625%',
+  },
+  {
+    id: 'fomc-2026-09',
+    metricId: 'fedRate',
+    title: 'FOMC Meeting',
+    titleKo: 'FOMC 회의',
+    country: 'US',
+    releaseDate: '2026-09-16',  // Wed
+    releaseTime: '14:00',
+    timezone: 'EDT',
+    frequency: 'adhoc',
+    impact: 'high',
+  },
+  {
+    id: 'fomc-2026-11',
+    metricId: 'fedRate',
+    title: 'FOMC Meeting',
+    titleKo: 'FOMC 회의',
+    country: 'US',
+    releaseDate: '2026-11-04',  // Wed
+    releaseTime: '14:00',
+    timezone: 'EST',
+    frequency: 'adhoc',
+    impact: 'high',
+  },
+  {
+    id: 'fomc-2026-12',
+    metricId: 'fedRate',
+    title: 'FOMC Meeting',
+    titleKo: 'FOMC 회의',
+    country: 'US',
+    releaseDate: '2026-12-16',  // Wed
+    releaseTime: '14:00',
+    timezone: 'EST',
+    frequency: 'adhoc',
+    impact: 'high',
+  },
+
+  // === US CPI (매월 15일 전후, BLS 발표) ===
+  {
+    id: 'cpi-us-2026-07',
+    metricId: 'cpiUs',
+    title: 'US CPI YoY',
+    titleKo: '미국 소비자물가지수',
+    country: 'US',
+    releaseDate: '2026-07-14',  // Tue
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+    estimate: '3.1%',
+    previous: '3.3%',
+  },
+  {
+    id: 'cpi-us-2026-08',
+    metricId: 'cpiUs',
+    title: 'US CPI YoY',
+    titleKo: '미국 소비자물가지수',
+    country: 'US',
+    releaseDate: '2026-08-13',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-us-2026-09',
+    metricId: 'cpiUs',
+    title: 'US CPI YoY',
+    titleKo: '미국 소비자물가지수',
+    country: 'US',
+    releaseDate: '2026-09-15',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-us-2026-10',
+    metricId: 'cpiUs',
+    title: 'US CPI YoY',
+    titleKo: '미국 소비자물가지수',
+    country: 'US',
+    releaseDate: '2026-10-15',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-us-2026-11',
+    metricId: 'cpiUs',
+    title: 'US CPI YoY',
+    titleKo: '미국 소비자물가지수',
+    country: 'US',
+    releaseDate: '2026-11-13',
+    releaseTime: '08:30',
+    timezone: 'EST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-us-2026-12',
+    metricId: 'cpiUs',
+    title: 'US CPI YoY',
+    titleKo: '미국 소비자물가지수',
+    country: 'US',
+    releaseDate: '2026-12-11',
+    releaseTime: '08:30',
+    timezone: 'EST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+
+  // === US PCE (매월 말, 한 달 전 데이터) ===
+  {
+    id: 'pce-us-2026-07',
+    metricId: 'pceUs',
+    title: 'US PCE Price Index YoY',
+    titleKo: '미국 PCE 물가지수',
+    country: 'US',
+    releaseDate: '2026-07-31',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+    previous: '2.7%',
+    estimate: '2.6%',
+  },
+  {
+    id: 'core-pce-us-2026-07',
+    metricId: 'corePce',
+    title: 'US Core PCE YoY',
+    titleKo: '미국 근원 PCE',
+    country: 'US',
+    releaseDate: '2026-07-31',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'pce-us-2026-08',
+    metricId: 'pceUs',
+    title: 'US PCE Price Index YoY',
+    titleKo: '미국 PCE 물가지수',
+    country: 'US',
+    releaseDate: '2026-08-28',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'pce-us-2026-09',
+    metricId: 'pceUs',
+    title: 'US PCE Price Index YoY',
+    titleKo: '미국 PCE 물가지수',
+    country: 'US',
+    releaseDate: '2026-09-30',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'pce-us-2026-10',
+    metricId: 'pceUs',
+    title: 'US PCE Price Index YoY',
+    titleKo: '미국 PCE 물가지수',
+    country: 'US',
+    releaseDate: '2026-10-30',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+
+  // === US Nonfarm Payrolls (매월 첫 금요일) ===
+  {
+    id: 'nfp-us-2026-07',
+    metricId: 'unemployment',
+    title: 'Nonfarm Payrolls',
+    titleKo: '비농업 고용지표',
+    country: 'US',
+    releaseDate: '2026-07-03',  // Fri
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+    previous: '185,000',
+    estimate: '190,000',
+  },
+  {
+    id: 'nfp-us-2026-08',
+    metricId: 'unemployment',
+    title: 'Nonfarm Payrolls',
+    titleKo: '비농업 고용지표',
+    country: 'US',
+    releaseDate: '2026-08-07',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'nfp-us-2026-09',
+    metricId: 'unemployment',
+    title: 'Nonfarm Payrolls',
+    titleKo: '비농업 고용지표',
+    country: 'US',
+    releaseDate: '2026-09-04',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'nfp-us-2026-10',
+    metricId: 'unemployment',
+    title: 'Nonfarm Payrolls',
+    titleKo: '비농업 고용지표',
+    country: 'US',
+    releaseDate: '2026-10-02',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'nfp-us-2026-11',
+    metricId: 'unemployment',
+    title: 'Nonfarm Payrolls',
+    titleKo: '비농업 고용지표',
+    country: 'US',
+    releaseDate: '2026-11-06',
+    releaseTime: '08:30',
+    timezone: 'EST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'nfp-us-2026-12',
+    metricId: 'unemployment',
+    title: 'Nonfarm Payrolls',
+    titleKo: '비농업 고용지표',
+    country: 'US',
+    releaseDate: '2026-12-04',
+    releaseTime: '08:30',
+    timezone: 'EST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+
+  // === US GDP (분기별, 속보-잠정-확정) ===
+  {
+    id: 'gdp-us-2026-q2-advance',
+    metricId: 'gdpUs',
+    title: 'US GDP Q2 Advance',
+    titleKo: '미국 GDP Q2 속보치',
+    country: 'US',
+    releaseDate: '2026-07-30',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'quarterly',
+    impact: 'high',
+  },
+  {
+    id: 'gdp-us-2026-q3-advance',
+    metricId: 'gdpUs',
+    title: 'US GDP Q3 Advance',
+    titleKo: '미국 GDP Q3 속보치',
+    country: 'US',
+    releaseDate: '2026-10-29',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'quarterly',
+    impact: 'high',
+  },
+
+  // === US PPI (매월 CPI 다음날 또는 일주일 후) ===
+  {
+    id: 'ppi-us-2026-07',
+    metricId: 'ppiUs',
+    title: 'US PPI YoY',
+    titleKo: '미국 생산자물가지수',
+    country: 'US',
+    releaseDate: '2026-07-15',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'medium',
+  },
+  {
+    id: 'ppi-us-2026-08',
+    metricId: 'ppiUs',
+    title: 'US PPI YoY',
+    titleKo: '미국 생산자물가지수',
+    country: 'US',
+    releaseDate: '2026-08-14',
+    releaseTime: '08:30',
+    timezone: 'EDT',
+    frequency: 'monthly',
+    impact: 'medium',
+  },
+
+  // === 한국은행 금통위 (연 8회, 목요일) ===
+  {
+    id: 'bok-2026-07',
+    metricId: 'bokRate',
+    title: 'BOK Monetary Policy',
+    titleKo: '한국은행 금융통화위원회',
+    country: 'KR',
+    releaseDate: '2026-07-11',  // Thu
+    releaseTime: '10:00',
+    timezone: 'KST',
+    frequency: 'adhoc',
+    impact: 'high',
+    previous: '2.75%',
+  },
+  {
+    id: 'bok-2026-08',
+    metricId: 'bokRate',
+    title: 'BOK Monetary Policy',
+    titleKo: '한국은행 금융통화위원회',
+    country: 'KR',
+    releaseDate: '2026-08-22',
+    releaseTime: '10:00',
+    timezone: 'KST',
+    frequency: 'adhoc',
+    impact: 'high',
+  },
+  {
+    id: 'bok-2026-10',
+    metricId: 'bokRate',
+    title: 'BOK Monetary Policy',
+    titleKo: '한국은행 금융통화위원회',
+    country: 'KR',
+    releaseDate: '2026-10-17',
+    releaseTime: '10:00',
+    timezone: 'KST',
+    frequency: 'adhoc',
+    impact: 'high',
+  },
+  {
+    id: 'bok-2026-11',
+    metricId: 'bokRate',
+    title: 'BOK Monetary Policy',
+    titleKo: '한국은행 금융통화위원회',
+    country: 'KR',
+    releaseDate: '2026-11-26',
+    releaseTime: '10:00',
+    timezone: 'KST',
+    frequency: 'adhoc',
+    impact: 'high',
+  },
+
+  // === 한국 CPI (매월 초, 통계청) ===
+  {
+    id: 'cpi-kr-2026-07',
+    metricId: 'cpiKr',
+    title: 'KR CPI YoY',
+    titleKo: '한국 소비자물가지수',
+    country: 'KR',
+    releaseDate: '2026-07-02',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-kr-2026-08',
+    metricId: 'cpiKr',
+    title: 'KR CPI YoY',
+    titleKo: '한국 소비자물가지수',
+    country: 'KR',
+    releaseDate: '2026-08-03',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-kr-2026-09',
+    metricId: 'cpiKr',
+    title: 'KR CPI YoY',
+    titleKo: '한국 소비자물가지수',
+    country: 'KR',
+    releaseDate: '2026-09-02',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-kr-2026-10',
+    metricId: 'cpiKr',
+    title: 'KR CPI YoY',
+    titleKo: '한국 소비자물가지수',
+    country: 'KR',
+    releaseDate: '2026-10-02',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-kr-2026-11',
+    metricId: 'cpiKr',
+    title: 'KR CPI YoY',
+    titleKo: '한국 소비자물가지수',
+    country: 'KR',
+    releaseDate: '2026-11-02',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+  {
+    id: 'cpi-kr-2026-12',
+    metricId: 'cpiKr',
+    title: 'KR CPI YoY',
+    titleKo: '한국 소비자물가지수',
+    country: 'KR',
+    releaseDate: '2026-12-02',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'high',
+  },
+
+  // === 한국 GDP (분기별, 한국은행) ===
+  {
+    id: 'gdp-kr-2026-q2',
+    metricId: 'gdpKr',
+    title: 'KR GDP Q2 (preliminary)',
+    titleKo: '한국 GDP Q2 잠정치',
+    country: 'KR',
+    releaseDate: '2026-07-23',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'quarterly',
+    impact: 'high',
+  },
+  {
+    id: 'gdp-kr-2026-q3',
+    metricId: 'gdpKr',
+    title: 'KR GDP Q3 (preliminary)',
+    titleKo: '한국 GDP Q3 잠정치',
+    country: 'KR',
+    releaseDate: '2026-10-23',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'quarterly',
+    impact: 'high',
+  },
+
+  // === 한국 PPI (매월, 한국은행) ===
+  {
+    id: 'ppi-kr-2026-07',
+    metricId: 'ppiKr',
+    title: 'KR PPI YoY',
+    titleKo: '한국 생산자물가지수',
+    country: 'KR',
+    releaseDate: '2026-07-20',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'medium',
+  },
+  {
+    id: 'ppi-kr-2026-08',
+    metricId: 'ppiKr',
+    title: 'KR PPI YoY',
+    titleKo: '한국 생산자물가지수',
+    country: 'KR',
+    releaseDate: '2026-08-20',
+    releaseTime: '08:00',
+    timezone: 'KST',
+    frequency: 'monthly',
+    impact: 'medium',
+  },
+];
+
+// Helper: 날짜로 필터링
+export function getEventsByDateRange(from: Date, to: Date): ScheduledEvent[] {
+  return scheduledEvents.filter(event => {
+    const eventDate = new Date(event.releaseDate);
+    return eventDate >= from && eventDate <= to;
+  });
+}
+
+// Helper: 지표 ID로 필터링
+export function getEventsByMetricId(metricId: string): ScheduledEvent[] {
+  return scheduledEvents.filter(event => event.metricId === metricId);
+}
+
+// Helper: Impact 레벨로 필터링
+export function getEventsByImpact(impact: 'high' | 'medium' | 'low'): ScheduledEvent[] {
+  return scheduledEvents.filter(event => event.impact === impact);
+}
