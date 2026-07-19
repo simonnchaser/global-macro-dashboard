@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react';
 import { scheduledEvents, type ScheduledEvent } from '@/lib/data/scheduledEvents';
 import { getMetricMeta } from '@/lib/metrics/metricsMeta';
 import ChartModal from '@/components/modals/ChartModal';
-import type { MetricId } from '@/lib/types/metrics';
+import type { MetricId } from '@/lib/metrics/metricsTypes';
 
 export default function CalendarTab() {
   const [selectedMetricId, setSelectedMetricId] = useState<MetricId | null>(null);
